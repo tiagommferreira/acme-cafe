@@ -6,7 +6,11 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -67,11 +71,26 @@ public class RegisterActivity extends AppCompatActivity {
     private View mRegisterFormView;
 
     private String mUUID;
-    private String mPin;
+    private int mPin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //If the user has already registered, skip the registration
+        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+
+        if (sharedPreferences.contains("uuid") && sharedPreferences.contains("pin")) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    goToMainActivity();
+                }
+            }, 10);
+        }
+
+
+
         setContentView(R.layout.activity_register);
         // Set up the register form.
         mNameView = (EditText) findViewById(R.id.name);
@@ -117,6 +136,15 @@ public class RegisterActivity extends AppCompatActivity {
         //if (mAuthTask != null) {
         //    return;
         //}
+
+        //If the user does not have an Internet connection, do not try to register
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
+            Snackbar.make(getCurrentFocus(), "Check your Internet connection", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return;
+        }
 
         // Reset errors.
         mNameView.setError(null);
@@ -207,10 +235,10 @@ public class RegisterActivity extends AppCompatActivity {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("Response", response.toString());
                         try {
                             mUUID = response.getString("uuid");
-                            mPin = response.getString("pin");
+                            mPin = response.getInt("pin");
+                            saveUserData();
                             showPINDialog();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -230,6 +258,14 @@ public class RegisterActivity extends AppCompatActivity {
         VolleySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsObjRequest);
     }
 
+    private void saveUserData() {
+        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("uuid", mUUID);
+        editor.putInt("pin", mPin);
+        editor.apply();
+    }
+
     private void showPINDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -237,7 +273,7 @@ public class RegisterActivity extends AppCompatActivity {
         View dialogView = inflater.inflate(R.layout.dialog_pin, null);
 
         TextView pinTextView = (TextView) dialogView.findViewById(R.id.pin_textview);
-        pinTextView.setText(mPin);
+        pinTextView.setText(String.valueOf(mPin));
 
         builder.setMessage(R.string.dialog_PIN_message)
                 .setTitle(R.string.dialog_PIN_title)
