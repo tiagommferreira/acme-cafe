@@ -4,10 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -23,6 +25,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -62,6 +65,9 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private View mProgressView;
     private View mRegisterFormView;
+
+    private String mUUID;
+    private String mPin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,8 +208,14 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("Response", response.toString());
-                        goToMainActivity();
-                        finish();
+                        try {
+                            mUUID = response.getString("uuid");
+                            mPin = response.getString("pin");
+                            showPINDialog();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                 }, new Response.ErrorListener() {
 
@@ -218,6 +230,29 @@ public class RegisterActivity extends AppCompatActivity {
         VolleySingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsObjRequest);
     }
 
+    private void showPINDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_pin, null);
+
+        TextView pinTextView = (TextView) dialogView.findViewById(R.id.pin_textview);
+        pinTextView.setText(mPin);
+
+        builder.setMessage(R.string.dialog_PIN_message)
+                .setTitle(R.string.dialog_PIN_title)
+                .setView(dialogView)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        goToMainActivity();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private boolean isNameValid(String name) {
         return name.length() >= 4;
     }
@@ -227,7 +262,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows the progress UI and hides the login form.
+     * Shows the progress UI and hides the register form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
@@ -273,6 +308,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void goToMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
 }

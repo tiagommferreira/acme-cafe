@@ -25,4 +25,7 @@
     <string name="prompt_name">Name</string>
     <string name="prompt_credit_card">CC</string>
     <string name="error_field_length">This field is too short</string>
+    <string name="dialog_PIN_message">Please store this PIN</string>
+    <string name="dialog_PIN_title">Your ACME PIN</string>
+    <string name="ok">ok</string>
 </resources>
