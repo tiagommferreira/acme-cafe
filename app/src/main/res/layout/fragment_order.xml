@@ -1,0 +1,10 @@
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/order_list"
+    android:name="org.feup.cmov.acmecafe.MenuList.MenuListFragment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layoutManager="LinearLayoutManager"
+    tools:context="org.feup.cmov.acmecafe.MenuList.MenuListFragment"
+    tools:listitem="@layout/order_list_item" />

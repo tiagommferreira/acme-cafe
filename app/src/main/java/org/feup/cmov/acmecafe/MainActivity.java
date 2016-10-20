@@ -1,16 +1,10 @@
 package org.feup.cmov.acmecafe;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,24 +14,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-
-import org.feup.cmov.acmecafe.MenuList.MenuListAdapter;
 import org.feup.cmov.acmecafe.MenuList.MenuListFragment;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.feup.cmov.acmecafe.OrderList.OrderFragment;
 
-import java.util.ArrayList;
-import java.util.concurrent.Exchanger;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MenuListFragment.OnMenuListInteractionListener {
+        MenuListFragment.OnMenuListInteractionListener,
+        OrderFragment.OnOrderItemInteracionListener {
 
+    HashMap<CafeItem,Integer> mCurrentOrder = new HashMap<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +85,8 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_menu_list) {
             fragmentClass = MenuListFragment.class;
-        } else if (id == R.id.nav_gallery) {
-
+        } else if (id == R.id.nav_current_order) {
+            fragmentClass = OrderFragment.class;
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -111,16 +98,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         try {
-            Fragment fragment = (Fragment) fragmentClass.newInstance();
+            Fragment fragment = null;
+            if(fragmentClass == OrderFragment.class) {
+                fragment = OrderFragment.newInstance(mCurrentOrder);
+            }
+            else {
+                fragment = (Fragment) fragmentClass.newInstance();
+            }
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.content_frame, fragment);
+            ft.addToBackStack(null);
             ft.commit();
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -129,6 +122,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onMenuListInteraction(CafeItem item) {
+        if(mCurrentOrder.containsKey(item)) {
+            mCurrentOrder.put(item, mCurrentOrder.get(item) + 1);
+        }
+        else {
+            mCurrentOrder.put(item, 1);
+        }
+
+        Snackbar.make(getCurrentFocus(), "Product " + item.getName() + " added to your current order.", Snackbar.LENGTH_SHORT)
+                .setAction("Action", null).show();
+
+    }
+
+    @Override
+    public void onItemInteraction(CafeItem item) {
 
     }
 }

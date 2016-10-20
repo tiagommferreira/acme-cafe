@@ -1,6 +1,8 @@
 package org.feup.cmov.acmecafe;
 
-public class CafeItem {
+import java.io.Serializable;
+
+public class CafeItem implements Serializable {
     private String mName;
     private float mPrice;
 

@@ -87,7 +87,7 @@ public class MenuListFragment extends Fragment {
             mListener = (OnMenuListInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnMenuListInteractionListener and GetMenuListInterface");
+                    + " must implement OnMenuListInteractionListener");
         }
     }
 
@@ -109,7 +109,6 @@ public class MenuListFragment extends Fragment {
                                 JSONObject object = (JSONObject) response.get(i);
                                 CafeItem item = new CafeItem(object.getString("name"), (float) object.getDouble("price"));
                                 mMenuItems.add(item);
-                                Log.d("MenuListFragment","Got Item");
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -121,7 +120,7 @@ public class MenuListFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // TODO Auto-generated method stub
-                        Log.d("Menu", error.getMessage());
+                        Log.e("Menu", "Error getting menu");
                     }
                 });
 
