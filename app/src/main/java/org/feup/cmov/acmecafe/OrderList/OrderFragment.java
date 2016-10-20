@@ -1,6 +1,7 @@
 package org.feup.cmov.acmecafe.OrderList;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,11 +10,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import org.feup.cmov.acmecafe.CafeItem;
 import org.feup.cmov.acmecafe.R;
+import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 
 
 public class OrderFragment extends Fragment {
@@ -24,6 +34,8 @@ public class OrderFragment extends Fragment {
     private OnOrderItemInteracionListener mListener;
 
     private RecyclerView.Adapter mOrderListAdapter;
+
+    private ImageView mQRCodeImageView;
 
 
     public OrderFragment() {
@@ -52,12 +64,75 @@ public class OrderFragment extends Fragment {
 
         Log.d("OrderFragment", "Size: " + String.valueOf(mCurrentOrder.size()));
 
-        RecyclerView recyclerView = (RecyclerView) view;
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.order_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         mOrderListAdapter = new OrderAdapter(mCurrentOrder, mListener);
         recyclerView.setAdapter(mOrderListAdapter);
 
+        mQRCodeImageView = (ImageView) view.findViewById(R.id.qr_code_image);
+
+        Button generateQRCodeButton = (Button) view.findViewById(R.id.qr_code_button);
+        generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                generateQRCode();
+            }
+        });
+
         return view;
+    }
+
+    private void generateQRCode() {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //JSONObject json = new JSONObject("");
+                //byte[] jsonBytes = json.toString().getBytes();
+                String dummy = "muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd";
+                String content = null;
+                try {
+                    content = new String(dummy.getBytes(), "ISO-8859-1");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    final Bitmap bitmap = encodeAsBitmap(content);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mQRCodeImageView.setImageBitmap(bitmap);
+                        }
+                    });
+
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    private Bitmap encodeAsBitmap(String content) throws WriterException {
+        BitMatrix result;
+        try {
+            result = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, 500, 500, null);
+        }
+        catch (IllegalArgumentException iae) {
+            // Unsupported format
+            return null;
+        }
+        int w = result.getWidth();
+        int h = result.getHeight();
+        int[] pixels = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            int offset = y * w;
+            for (int x = 0; x < w; x++) {
+                pixels[offset + x] = result.get(x, y) ? getResources().getColor(R.color.colorPrimary):getResources().getColor(R.color.white);
+            }
+        }
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        bitmap.setPixels(pixels, 0, 500, 0, 0, w, h);
+        return bitmap;
     }
 
     @Override
