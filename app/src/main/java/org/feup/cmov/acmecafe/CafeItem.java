@@ -1,10 +1,10 @@
 package org.feup.cmov.acmecafe;
 
-public class MenuListItem {
+public class CafeItem {
     private String mName;
     private float mPrice;
 
-    public MenuListItem(String name, float price) {
+    public CafeItem(String name, float price) {
         this.mName = name;
         this.mPrice = price;
     }
