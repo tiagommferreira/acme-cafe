@@ -25,16 +25,17 @@ public class MainActivity extends AppCompatActivity
         OrderFragment.OnOrderItemInteracionListener {
 
     HashMap<CafeItem,Integer> mCurrentOrder = new HashMap<>();
+    Toolbar mToolbar;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -85,8 +86,10 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_menu_list) {
             fragmentClass = MenuListFragment.class;
+            mToolbar.setTitle("Menu");
         } else if (id == R.id.nav_current_order) {
             fragmentClass = OrderFragment.class;
+            mToolbar.setTitle("Current Order");
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
