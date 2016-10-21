@@ -3,10 +3,12 @@ package org.feup.cmov.acmecafe;
 import java.io.Serializable;
 
 public class CafeItem implements Serializable {
+    private int mId;
     private String mName;
     private float mPrice;
 
-    public CafeItem(String name, float price) {
+    public CafeItem(int id, String name, float price) {
+        this.mId = id;
         this.mName = name;
         this.mPrice = price;
     }

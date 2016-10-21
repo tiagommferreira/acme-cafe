@@ -1,7 +1,10 @@
 package org.feup.cmov.acmecafe.MenuList;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -67,13 +70,13 @@ public class MenuListFragment extends Fragment {
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    getMenu();
+                    attemptGetMenu();
                 }
             });
 
             Log.d("MenuListFragment", "on create view");
 
-            getMenu();
+            attemptGetMenu();
 
         }
 
@@ -95,6 +98,24 @@ public class MenuListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        //If the fragment is detached and there is a menu request in queue, cancel it
+        if (VolleySingleton.getInstance(this.getActivity().getApplicationContext()).getRequestQueue() != null) {
+            VolleySingleton.getInstance(this.getActivity().getApplicationContext()).getRequestQueue().cancelAll(GET_MENU_TAG);
+        }
+    }
+
+    public void attemptGetMenu() {
+        //If the user does not have an Internet connection, do not try to register
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+            Snackbar.make(getActivity().getCurrentFocus(), "Check your Internet connection", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return;
+        }
+
+        getMenu();
     }
 
     public void getMenu() {
@@ -107,7 +128,7 @@ public class MenuListFragment extends Fragment {
                         for(int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject object = (JSONObject) response.get(i);
-                                CafeItem item = new CafeItem(object.getString("name"), (float) object.getDouble("price"));
+                                CafeItem item = new CafeItem(object.getInt("id"), object.getString("name"), (float) object.getDouble("price"));
                                 mMenuItems.add(item);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -119,7 +140,6 @@ public class MenuListFragment extends Fragment {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
                         Log.e("Menu", "Error getting menu");
                     }
                 });
