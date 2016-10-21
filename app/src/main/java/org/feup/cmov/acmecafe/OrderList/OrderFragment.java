@@ -1,6 +1,7 @@
 package org.feup.cmov.acmecafe.OrderList;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,8 @@ import android.widget.ImageView;
 
 import org.feup.cmov.acmecafe.CafeItem;
 import org.feup.cmov.acmecafe.R;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -86,13 +89,30 @@ public class OrderFragment extends Fragment {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                //JSONObject json = new JSONObject("");
-                //byte[] jsonBytes = json.toString().getBytes();
-                String dummy = "muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd muckfeloxd";
-                String content = null;
+                String content = "";
                 try {
-                    content = new String(dummy.getBytes(), "ISO-8859-1");
-                } catch (UnsupportedEncodingException e) {
+                    JSONObject toSend = new JSONObject();
+                    String uuid = getUserUUID();
+                    toSend.put("uuid", uuid);
+
+                    JSONArray products = new JSONArray();
+                    for(int i = 0; i < mCurrentOrder.size(); i++) {
+                        JSONObject product = new JSONObject();
+                        CafeItem item = (CafeItem) mCurrentOrder.keySet().toArray()[i];
+                        product.put("id", item.getId());
+                        product.put("name", item.getName());
+                        product.put("price", item.getPrice());
+                        product.put("quantity", mCurrentOrder.get(item));
+                        products.put(product);
+                    }
+                    toSend.put("products", products);
+
+                    JSONArray vouchers = new JSONArray();
+                    toSend.put("vouchers", vouchers);
+
+                    byte[] toSendBytes = toSend.toString().getBytes();
+                    content = new String(toSendBytes, "ISO-8859-1");
+                } catch (UnsupportedEncodingException | JSONException e) {
                     e.printStackTrace();
                 }
                 try {
@@ -110,6 +130,12 @@ public class OrderFragment extends Fragment {
             }
         });
         t.start();
+    }
+
+    private String getUserUUID() {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String defaultValue = "Could not get UUID from shared preferences";
+        return sharedPref.getString("uuid", defaultValue);
     }
 
     private Bitmap encodeAsBitmap(String content) throws WriterException {

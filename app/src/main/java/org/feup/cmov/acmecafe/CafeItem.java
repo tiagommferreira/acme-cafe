@@ -13,6 +13,10 @@ public class CafeItem implements Serializable {
         this.mPrice = price;
     }
 
+    public int getId() {
+        return mId;
+    }
+
     public String getName() {
         return this.mName;
     }
