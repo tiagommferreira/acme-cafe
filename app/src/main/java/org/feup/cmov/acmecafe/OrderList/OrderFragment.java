@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import org.feup.cmov.acmecafe.CafeItem;
+import org.feup.cmov.acmecafe.MainActivity;
 import org.feup.cmov.acmecafe.R;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -176,6 +177,13 @@ public class OrderFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity activity = (MainActivity) getActivity();
+        activity.setToolbarTitle("Current Order");
     }
 
     public interface OnOrderItemInteracionListener {

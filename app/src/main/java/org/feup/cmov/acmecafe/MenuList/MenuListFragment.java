@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.feup.cmov.acmecafe.CafeItem;
+import org.feup.cmov.acmecafe.MainActivity;
 import org.feup.cmov.acmecafe.R;
 import org.feup.cmov.acmecafe.VolleySingleton;
 import org.json.JSONArray;
@@ -102,6 +103,13 @@ public class MenuListFragment extends Fragment {
         if (VolleySingleton.getInstance(this.getActivity().getApplicationContext()).getRequestQueue() != null) {
             VolleySingleton.getInstance(this.getActivity().getApplicationContext()).getRequestQueue().cancelAll(GET_MENU_TAG);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity activity = (MainActivity) getActivity();
+        activity.setToolbarTitle("Menu");
     }
 
     public void attemptGetMenu() {

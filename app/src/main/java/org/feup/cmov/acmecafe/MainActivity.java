@@ -1,5 +1,6 @@
 package org.feup.cmov.acmecafe;
 
+import android.hardware.camera2.params.Face;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -39,9 +40,32 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        this.getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                Fragment fragment = getCurrentFragment();
+                if(fragment instanceof MenuListFragment) {
+                    navigationView.setCheckedItem(R.id.nav_menu_list);
+                }
+                else if(fragment instanceof OrderFragment) {
+                    navigationView.setCheckedItem(R.id.nav_current_order);
+                }
+            }
+        });
+
+        swapFragment(MenuListFragment.newInstance());
+
+    }
+
+    public void setToolbarTitle(String title) {
+        this.mToolbar.setTitle(title);
+    }
+
+    private Fragment getCurrentFragment() {
+        return this.getSupportFragmentManager().findFragmentById(R.id.content_frame);
     }
 
     @Override
@@ -86,17 +110,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_menu_list) {
             fragmentClass = MenuListFragment.class;
-            mToolbar.setTitle("Menu");
         } else if (id == R.id.nav_current_order) {
             fragmentClass = OrderFragment.class;
-            mToolbar.setTitle("Current Order");
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 
@@ -108,11 +126,7 @@ public class MainActivity extends AppCompatActivity
             else {
                 fragment = (Fragment) fragmentClass.newInstance();
             }
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
-            ft.addToBackStack(null);
-            ft.commit();
+            swapFragment(fragment);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -121,6 +135,14 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void swapFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.replace(R.id.content_frame, fragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
