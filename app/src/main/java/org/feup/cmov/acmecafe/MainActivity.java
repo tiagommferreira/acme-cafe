@@ -13,20 +13,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import org.feup.cmov.acmecafe.MenuList.MenuListFragment;
 import org.feup.cmov.acmecafe.Models.CafeItem;
+import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.OrderList.OrderFragment;
+import org.feup.cmov.acmecafe.VoucherList.VoucherListFragment;
 
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MenuListFragment.OnMenuListInteractionListener,
-        OrderFragment.OnOrderItemInteracionListener {
+        OrderFragment.OnOrderItemInteracionListener,
+        VoucherListFragment.OnVoucherInteractionListener {
 
     HashMap<CafeItem,Integer> mCurrentOrder = new HashMap<>();
     Toolbar mToolbar;
@@ -114,9 +116,9 @@ public class MainActivity extends AppCompatActivity
             fragmentClass = MenuListFragment.class;
         } else if (id == R.id.nav_current_order) {
             fragmentClass = OrderFragment.class;
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_vouchers) {
+            fragmentClass = VoucherListFragment.class;
+        } else if (id == R.id.nav_past_transactions) {
 
         }
 
@@ -163,6 +165,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onItemInteraction(CafeItem item) {
+
+    }
+
+    @Override
+    public void onVoucherAdded(Voucher voucher) {
 
     }
 }

@@ -11,13 +11,13 @@
             android:icon="@drawable/ic_current_order"
             android:title="Current Order" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_vouchers"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="Vouchers" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_past_transactions"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Past Transactions" />
     </group>
     <!--
     <item android:title="Communicate">

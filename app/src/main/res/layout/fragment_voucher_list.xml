@@ -1,0 +1,18 @@
+<android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/voucherSwipeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/voucher_list"
+        android:name="org.feup.cmov.acmecafe.VoucherList.VoucherListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="org.feup.cmov.acmecafe.VoucherList.VoucherListFragment"
+        tools:listitem="@layout/voucher_list_item" />
+
+</android.support.v4.widget.SwipeRefreshLayout>
