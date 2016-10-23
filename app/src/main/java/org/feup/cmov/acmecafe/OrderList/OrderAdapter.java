@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.feup.cmov.acmecafe.CafeItem;
+import org.feup.cmov.acmecafe.Models.CafeItem;
 import org.feup.cmov.acmecafe.R;
 
 import java.util.HashMap;

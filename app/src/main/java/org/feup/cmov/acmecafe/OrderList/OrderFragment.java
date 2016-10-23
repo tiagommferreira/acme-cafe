@@ -1,10 +1,13 @@
 package org.feup.cmov.acmecafe.OrderList;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,9 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
-import org.feup.cmov.acmecafe.CafeItem;
+import org.feup.cmov.acmecafe.Models.CafeItem;
 import org.feup.cmov.acmecafe.MainActivity;
 import org.feup.cmov.acmecafe.R;
 import org.json.JSONArray;
@@ -66,8 +71,6 @@ public class OrderFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_order, container, false);
 
-        Log.d("OrderFragment", "Size: " + String.valueOf(mCurrentOrder.size()));
-
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.order_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         mOrderListAdapter = new OrderAdapter(mCurrentOrder, mListener);
@@ -79,11 +82,49 @@ public class OrderFragment extends Fragment {
         generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                generateQRCode();
+                askUserForPIN();
             }
         });
 
         return view;
+    }
+
+    private void askUserForPIN() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        LayoutInflater inflater = this.getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_ask_pin, null);
+
+        final EditText pinEditText = (EditText) dialogView.findViewById(R.id.ask_pin_input);
+
+        builder.setTitle(R.string.dialog_ask_PIN_title)
+                .setView(dialogView)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(Integer.parseInt(pinEditText.getText().toString()) == getUserPIN()) {
+                            generateQRCode();
+                        }
+                        else {
+                            showErrorSnackBar();
+                        }
+
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showErrorSnackBar() {
+        Snackbar.make(getActivity().getCurrentFocus(), "Incorrect PIN", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 
     private void generateQRCode() {
@@ -134,9 +175,15 @@ public class OrderFragment extends Fragment {
     }
 
     private String getUserUUID() {
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.user_details_prefs),Context.MODE_PRIVATE);
         String defaultValue = "Could not get UUID from shared preferences";
         return sharedPref.getString("uuid", defaultValue);
+    }
+
+    private int getUserPIN() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.user_details_prefs),Context.MODE_PRIVATE);
+        int defaultValue = 0000;
+        return sharedPref.getInt("pin", defaultValue);
     }
 
     private Bitmap encodeAsBitmap(String content) throws WriterException {

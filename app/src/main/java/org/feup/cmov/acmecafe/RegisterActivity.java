@@ -78,7 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //If the user has already registered, skip the registration
-        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.user_details_prefs),Context.MODE_PRIVATE);
 
         if (sharedPreferences.contains("uuid") && sharedPreferences.contains("pin")) {
             new Handler().postDelayed(new Runnable() {
@@ -88,8 +88,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }, 10);
         }
-
-
 
         setContentView(R.layout.activity_register);
         // Set up the register form.
@@ -249,7 +247,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
+
                         Log.d("Register", error.getMessage());
                     }
                 });
@@ -259,7 +257,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void saveUserData() {
-        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.user_details_prefs),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("uuid", mUUID);
         editor.putInt("pin", mPin);

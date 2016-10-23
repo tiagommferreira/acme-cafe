@@ -31,4 +31,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_ask_PIN_title">Please enter your PIN</string>
+    <string name="user_details_prefs">UserDetails</string>
 </resources>

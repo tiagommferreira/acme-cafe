@@ -1,4 +1,4 @@
-package org.feup.cmov.acmecafe;
+package org.feup.cmov.acmecafe.Models;
 
 import java.io.Serializable;
 
