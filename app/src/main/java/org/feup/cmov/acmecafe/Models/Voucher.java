@@ -1,6 +1,8 @@
 package org.feup.cmov.acmecafe.Models;
 
-public class Voucher {
+import java.io.Serializable;
+
+public class Voucher implements Serializable {
     private int mId;
     private int mType;
     private String mName;

@@ -122,7 +122,7 @@ public class MenuListFragment extends Fragment {
     }
 
     public void getMenu() {
-        String url = "http://10.0.2.2:8080/menu";
+        String url = "https://acme-cafe.herokuapp.com/menu";
         JsonArrayRequest jsObjRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override

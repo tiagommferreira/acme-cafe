@@ -1,7 +1,5 @@
 package org.feup.cmov.acmecafe;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -22,15 +20,18 @@ import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.OrderList.OrderFragment;
 import org.feup.cmov.acmecafe.VoucherList.VoucherListFragment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MenuListFragment.OnMenuListInteractionListener,
         OrderFragment.OnOrderItemInteracionListener,
+        OrderFragment.OnOrderVoucherInteractionListener,
         VoucherListFragment.OnVoucherInteractionListener {
 
     HashMap<CafeItem,Integer> mCurrentOrder = new HashMap<>();
+    ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
     Toolbar mToolbar;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity
         try {
             Fragment fragment = null;
             if(fragmentClass == OrderFragment.class) {
-                fragment = OrderFragment.newInstance(mCurrentOrder);
+                fragment = OrderFragment.newInstance(mCurrentOrder, mOrderVouchers);
             }
             else {
                 fragment = (Fragment) fragmentClass.newInstance();
@@ -170,6 +171,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onVoucherAdded(Voucher voucher) {
+        mOrderVouchers.add(voucher);
+
+        Snackbar.make(getCurrentFocus(), "Voucher " + voucher.getName() + " added to your current order.", Snackbar.LENGTH_SHORT)
+                .setAction("Action", null).show();
+    }
+
+    @Override
+    public void onVoucherInteraction(Voucher item) {
 
     }
 }

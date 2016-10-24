@@ -100,7 +100,7 @@ public class VoucherListFragment extends Fragment {
     }
 
     private void getVouchers() {
-        String url = "http://10.0.2.2:8080/vouchers/" + getUserUUID();
+        String url = "https://acme-cafe.herokuapp.com/vouchers/" + getUserUUID();
         JsonArrayRequest jsObjRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override

@@ -217,7 +217,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void register(String name, String username, String creditcard, String password) {
-        String url = "http://10.0.2.2:8080/register";
+        String url = "https://acme-cafe.herokuapp.com/register";
         JSONObject body = new JSONObject();
         try {
             body.put("name", name);

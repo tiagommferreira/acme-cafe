@@ -21,12 +21,15 @@ import android.widget.TextView;
 
 import org.feup.cmov.acmecafe.Models.CafeItem;
 import org.feup.cmov.acmecafe.MainActivity;
+import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
+import org.feup.cmov.acmecafe.VoucherList.VoucherListAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.google.zxing.BarcodeFormat;
@@ -37,23 +40,27 @@ import com.google.zxing.common.BitMatrix;
 
 public class OrderFragment extends Fragment {
     private static final String ARG_ORDER_CONTENT = "order_content";
+    private static final String ARG_ORDER_VOUCHERS = "order_vouchers";
 
-    private HashMap<CafeItem, Integer> mCurrentOrder;
+    private HashMap<CafeItem, Integer> mCurrentOrder = new HashMap<>();
+    private ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
 
     private OnOrderItemInteracionListener mListener;
+    private OnOrderVoucherInteractionListener mVoucherListener;
 
     private RecyclerView.Adapter mOrderListAdapter;
+    private RecyclerView.Adapter mOrderVoucherListAdapter;
 
     private ImageView mQRCodeImageView;
-
 
     public OrderFragment() {
     }
 
-    public static OrderFragment newInstance(HashMap<CafeItem, Integer> currentOrder) {
+    public static OrderFragment newInstance(HashMap<CafeItem, Integer> currentOrder, ArrayList<Voucher> vouchers) {
         OrderFragment fragment = new OrderFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_ORDER_CONTENT, currentOrder);
+        args.putSerializable(ARG_ORDER_VOUCHERS, vouchers);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,6 +70,7 @@ public class OrderFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mCurrentOrder = (HashMap<CafeItem, Integer>) getArguments().getSerializable(ARG_ORDER_CONTENT);
+            mOrderVouchers = (ArrayList<Voucher>) getArguments().getSerializable(ARG_ORDER_VOUCHERS);
         }
     }
 
@@ -75,6 +83,11 @@ public class OrderFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         mOrderListAdapter = new OrderAdapter(mCurrentOrder, mListener);
         recyclerView.setAdapter(mOrderListAdapter);
+
+        RecyclerView voucherRecyclerView = (RecyclerView) view.findViewById(R.id.order_voucher_list);
+        voucherRecyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        mOrderVoucherListAdapter = new OrderVoucherAdapter(mOrderVouchers, mVoucherListener);
+        voucherRecyclerView.setAdapter(mOrderVoucherListAdapter);
 
         mQRCodeImageView = (ImageView) view.findViewById(R.id.qr_code_image);
 
@@ -150,6 +163,15 @@ public class OrderFragment extends Fragment {
                     toSend.put("products", products);
 
                     JSONArray vouchers = new JSONArray();
+                    for(int i = 0; i < mOrderVouchers.size(); i++) {
+                        JSONObject voucher = new JSONObject();
+                        Voucher item = mOrderVouchers.get(i);
+                        voucher.put("id", item.getId());
+                        voucher.put("name", item.getName());
+                        voucher.put("type", item.getType());
+                        voucher.put("signature", item.getSignature());
+                        vouchers.put(voucher);
+                    }
                     toSend.put("vouchers", vouchers);
 
                     byte[] toSendBytes = toSend.toString().getBytes();
@@ -212,11 +234,12 @@ public class OrderFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnOrderItemInteracionListener) {
+        if (context instanceof OnOrderItemInteracionListener && context instanceof OnOrderVoucherInteractionListener) {
             mListener = (OnOrderItemInteracionListener) context;
+            mVoucherListener = (OnOrderVoucherInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnOrderItemInteracionListener");
+                    + " must implement OnOrderItemInteracionListener and OnOrderVoucherInteractionListener");
         }
     }
 
@@ -235,5 +258,9 @@ public class OrderFragment extends Fragment {
 
     public interface OnOrderItemInteracionListener {
         void onItemInteraction(CafeItem item);
+    }
+
+    public interface OnOrderVoucherInteractionListener {
+        void onVoucherInteraction(Voucher item);
     }
 }
