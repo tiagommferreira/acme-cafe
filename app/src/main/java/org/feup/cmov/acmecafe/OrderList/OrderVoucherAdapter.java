@@ -47,7 +47,7 @@ public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapte
         holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onVoucherInteraction(voucher);
+                mListener.onVoucherRemove(voucher);
             }
         });
     }

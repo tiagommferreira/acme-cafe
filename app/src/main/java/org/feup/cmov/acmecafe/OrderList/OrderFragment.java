@@ -257,10 +257,10 @@ public class OrderFragment extends Fragment {
     }
 
     public interface OnOrderItemInteracionListener {
-        void onItemInteraction(CafeItem item);
+        void onItemRemove(CafeItem item, int post, RecyclerView.Adapter adapter);
     }
 
     public interface OnOrderVoucherInteractionListener {
-        void onVoucherInteraction(Voucher item);
+        void onVoucherRemove(Voucher item);
     }
 }

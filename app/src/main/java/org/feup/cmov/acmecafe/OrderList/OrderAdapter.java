@@ -48,14 +48,15 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         final CafeItem item = (CafeItem) mDataset.keySet().toArray()[position];
+        final RecyclerView.Adapter adapter = this;
         holder.mNameTextView.setText(item.getName());
         holder.mPriceTextView.setText("Quantity: " + String.valueOf(mDataset.get(item)));
         holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onItemInteraction(item);
+                mListener.onItemRemove(item, position, adapter);
             }
         });
     }

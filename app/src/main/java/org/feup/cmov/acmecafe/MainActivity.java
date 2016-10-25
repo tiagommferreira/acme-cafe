@@ -10,7 +10,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -165,8 +167,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemInteraction(CafeItem item) {
-
+    public void onItemRemove(CafeItem item, int pos, RecyclerView.Adapter adapter) {
+        if(mCurrentOrder.get(item) > 1) {
+            mCurrentOrder.put(item, mCurrentOrder.get(item) - 1);
+            adapter.notifyItemChanged(pos);
+        }
+        else {
+            mCurrentOrder.remove(item);
+            adapter.notifyItemRemoved(pos);
+        }
     }
 
     @Override
@@ -178,7 +187,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onVoucherInteraction(Voucher item) {
+    public void onVoucherRemove(Voucher item) {
 
     }
 }
