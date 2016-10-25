@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     HashMap<CafeItem,Integer> mCurrentOrder = new HashMap<>();
     ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
+    ArrayList<Voucher> mUserVouchers = new ArrayList<>();
     Toolbar mToolbar;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +131,9 @@ public class MainActivity extends AppCompatActivity
             if(fragmentClass == OrderFragment.class) {
                 fragment = OrderFragment.newInstance(mCurrentOrder, mOrderVouchers);
             }
+            else if(fragmentClass == VoucherListFragment.class) {
+                fragment = VoucherListFragment.newInstance(mUserVouchers);
+            }
             else {
                 fragment = (Fragment) fragmentClass.newInstance();
             }
@@ -179,15 +183,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onVoucherAdded(Voucher voucher) {
+    public void onVoucherAdded(Voucher voucher, int pos, RecyclerView.Adapter adapter) {
+        voucher.setIsUsed(true);
         mOrderVouchers.add(voucher);
+        adapter.notifyItemChanged(pos);
 
         Snackbar.make(getCurrentFocus(), "Voucher " + voucher.getName() + " added to your current order.", Snackbar.LENGTH_SHORT)
                 .setAction("Action", null).show();
     }
 
     @Override
-    public void onVoucherRemove(Voucher item) {
+    public void onVoucherRefreshed(ArrayList<Voucher> userVouchers) {
+        mOrderVouchers.clear();
+        mUserVouchers = userVouchers;
+    }
 
+    @Override
+    public void onVoucherRemove(Voucher item, int pos, RecyclerView.Adapter adapter) {
+        item.setIsUsed(false);
+        this.mOrderVouchers.remove(item);
+        adapter.notifyItemRemoved(pos);
     }
 }

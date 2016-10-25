@@ -41,13 +41,15 @@ public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         final Voucher voucher = mDataset.get(position);
         holder.mNameTextView.setText(voucher.getName());
+
+        final RecyclerView.Adapter adapter = this;
         holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onVoucherRemove(voucher);
+                mListener.onVoucherRemove(voucher, position, adapter);
             }
         });
     }

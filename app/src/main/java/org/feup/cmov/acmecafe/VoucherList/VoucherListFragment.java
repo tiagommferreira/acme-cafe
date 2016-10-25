@@ -34,9 +34,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 public class VoucherListFragment extends Fragment {
     private static final String GET_VOUCHERS_TAG = "GET_VOUCHERS";
+    private static final String ARG_USER_VOUCHERS = "USER_VOUCHERS";
 
     private OnVoucherInteractionListener mListener;
 
@@ -47,15 +47,20 @@ public class VoucherListFragment extends Fragment {
     public VoucherListFragment() {
     }
 
-
-    // TODO: Rename and change types and number of parameters
-    public static VoucherListFragment newInstance() {
-        return new VoucherListFragment();
+    public static VoucherListFragment newInstance(ArrayList<Voucher> vouchers) {
+        VoucherListFragment fragment = new VoucherListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_USER_VOUCHERS, vouchers);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mVouchers = (ArrayList<Voucher>) getArguments().getSerializable(ARG_USER_VOUCHERS);
+        }
     }
 
     @Override
@@ -78,8 +83,8 @@ public class VoucherListFragment extends Fragment {
                     attemptGetVouchers();
                 }
             });
-
-            attemptGetVouchers();
+            if(mVouchers.size() == 0)
+                attemptGetVouchers();
         }
 
         return view;
@@ -116,6 +121,7 @@ public class VoucherListFragment extends Fragment {
                             }
                         }
                         mVoucherListAdapter.notifyDataSetChanged();
+                        mListener.onVoucherRefreshed(mVouchers);
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }, new Response.ErrorListener() {
@@ -164,6 +170,7 @@ public class VoucherListFragment extends Fragment {
     }
 
     public interface OnVoucherInteractionListener {
-        void onVoucherAdded(Voucher voucher);
+        void onVoucherAdded(Voucher voucher, int pos, RecyclerView.Adapter adapter);
+        void onVoucherRefreshed(ArrayList<Voucher> userVouchers);
     }
 }
