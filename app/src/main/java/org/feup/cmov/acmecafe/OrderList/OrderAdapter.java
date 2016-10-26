@@ -7,14 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.feup.cmov.acmecafe.Models.CafeItem;
+import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.R;
 
 import java.util.HashMap;
 
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> {
-    private HashMap<CafeItem, Integer> mDataset;
+    private HashMap<Product, Integer> mDataset;
     private final OrderFragment.OnOrderItemInteracionListener mListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -30,7 +30,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public OrderAdapter(HashMap<CafeItem, Integer> myDataset,
+    public OrderAdapter(HashMap<Product, Integer> myDataset,
                            OrderFragment.OnOrderItemInteracionListener listener) {
         mDataset = myDataset;
         this.mListener = listener;
@@ -49,7 +49,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        final CafeItem item = (CafeItem) mDataset.keySet().toArray()[position];
+        final Product item = (Product) mDataset.keySet().toArray()[position];
         final RecyclerView.Adapter adapter = this;
         holder.mNameTextView.setText(item.getName());
         holder.mPriceTextView.setText("Quantity: " + String.valueOf(mDataset.get(item)));

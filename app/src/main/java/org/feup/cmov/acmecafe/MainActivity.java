@@ -12,12 +12,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import org.feup.cmov.acmecafe.MenuList.MenuListFragment;
-import org.feup.cmov.acmecafe.Models.CafeItem;
+import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.OrderList.OrderFragment;
 import org.feup.cmov.acmecafe.VoucherList.VoucherListFragment;
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity
         OrderFragment.OnOrderVoucherInteractionListener,
         VoucherListFragment.OnVoucherInteractionListener {
 
-    HashMap<CafeItem,Integer> mCurrentOrder = new HashMap<>();
+    HashMap<Product,Integer> mCurrentOrder = new HashMap<>();
     ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
     ArrayList<Voucher> mUserVouchers = new ArrayList<>();
     Toolbar mToolbar;
@@ -157,7 +156,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMenuListInteraction(CafeItem item) {
+    public void onMenuListInteraction(Product item) {
         if(mCurrentOrder.containsKey(item)) {
             mCurrentOrder.put(item, mCurrentOrder.get(item) + 1);
         }
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemRemove(CafeItem item, int pos, RecyclerView.Adapter adapter) {
+    public void onItemRemove(Product item, int pos, RecyclerView.Adapter adapter) {
         if(mCurrentOrder.get(item) > 1) {
             mCurrentOrder.put(item, mCurrentOrder.get(item) - 1);
             adapter.notifyItemChanged(pos);
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemHardRemove(CafeItem item, int pos, RecyclerView.Adapter adapter) {
+    public void onItemHardRemove(Product item, int pos, RecyclerView.Adapter adapter) {
         mCurrentOrder.remove(item);
         adapter.notifyItemRemoved(pos);
     }

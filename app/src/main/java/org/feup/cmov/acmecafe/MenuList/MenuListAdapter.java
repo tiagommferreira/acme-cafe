@@ -7,13 +7,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.feup.cmov.acmecafe.Models.CafeItem;
+import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.R;
 
 import java.util.ArrayList;
 
 public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.ViewHolder> {
-    private ArrayList<CafeItem> mDataset;
+    private ArrayList<Product> mDataset;
     private final MenuListFragment.OnMenuListInteractionListener mListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -29,7 +29,7 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.ViewHo
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MenuListAdapter(ArrayList<CafeItem> myDataset,
+    public MenuListAdapter(ArrayList<Product> myDataset,
                            MenuListFragment.OnMenuListInteractionListener listener) {
         mDataset = myDataset;
         this.mListener = listener;
@@ -48,7 +48,7 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.ViewHo
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final CafeItem item = mDataset.get(position);
+        final Product item = mDataset.get(position);
         holder.mNameTextView.setText(item.getName());
         holder.mPriceTextView.setText(String.valueOf(item.getPrice()) + "€");
         holder.mAddToCartImageView.setOnClickListener(new View.OnClickListener() {

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -22,8 +21,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.feup.cmov.acmecafe.MainActivity;
-import org.feup.cmov.acmecafe.MenuList.MenuListAdapter;
-import org.feup.cmov.acmecafe.Models.CafeItem;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
 import org.feup.cmov.acmecafe.VolleySingleton;
@@ -32,7 +29,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class VoucherListFragment extends Fragment {
     private static final String GET_VOUCHERS_TAG = "GET_VOUCHERS";

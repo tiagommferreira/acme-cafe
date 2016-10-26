@@ -19,7 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
-import org.feup.cmov.acmecafe.Models.CafeItem;
+import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.MainActivity;
 import org.feup.cmov.acmecafe.R;
 import org.feup.cmov.acmecafe.VolleySingleton;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 public class MenuListFragment extends Fragment {
     private static final String GET_MENU_TAG = "GET_MENU";
 
-    private ArrayList<CafeItem> mMenuItems = new ArrayList<>();
+    private ArrayList<Product> mMenuItems = new ArrayList<>();
 
     private OnMenuListInteractionListener mListener;
 
@@ -65,6 +65,8 @@ public class MenuListFragment extends Fragment {
             mMenuListAdapter = new MenuListAdapter(mMenuItems, mListener);
             recyclerView.setAdapter(mMenuListAdapter);
 
+            mMenuItems.addAll(Product.listAll(Product.class));
+
             mSwipeRefreshLayout = (SwipeRefreshLayout) view;
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
@@ -73,7 +75,7 @@ public class MenuListFragment extends Fragment {
                 }
             });
 
-            attemptGetMenu();
+            //attemptGetMenu();
         }
 
         return view;
@@ -128,10 +130,12 @@ public class MenuListFragment extends Fragment {
                     @Override
                     public void onResponse(JSONArray response) {
                         mMenuItems.clear();
+                        Product.deleteAll(Product.class);
                         for(int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject object = (JSONObject) response.get(i);
-                                CafeItem item = new CafeItem(object.getInt("id"), object.getString("name"), (float) object.getDouble("price"));
+                                Product item = new Product(object.getInt("id"), object.getString("name"), (float) object.getDouble("price"));
+                                item.save();
                                 mMenuItems.add(item);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -152,7 +156,7 @@ public class MenuListFragment extends Fragment {
     }
 
     public interface OnMenuListInteractionListener {
-        void onMenuListInteraction(CafeItem item);
+        void onMenuListInteraction(Product item);
     }
 
 }

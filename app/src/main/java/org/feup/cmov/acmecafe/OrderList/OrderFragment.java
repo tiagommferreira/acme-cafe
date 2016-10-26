@@ -17,20 +17,17 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import org.feup.cmov.acmecafe.Models.CafeItem;
+import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.MainActivity;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
-import org.feup.cmov.acmecafe.VoucherList.VoucherListAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +46,7 @@ public class OrderFragment extends Fragment {
     private static final String ARG_ORDER_CONTENT = "order_content";
     private static final String ARG_ORDER_VOUCHERS = "order_vouchers";
 
-    private HashMap<CafeItem, Integer> mCurrentOrder = new HashMap<>();
+    private HashMap<Product, Integer> mCurrentOrder = new HashMap<>();
     private ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
 
     private OnOrderItemInteracionListener mListener;
@@ -63,7 +60,7 @@ public class OrderFragment extends Fragment {
     public OrderFragment() {
     }
 
-    public static OrderFragment newInstance(HashMap<CafeItem, Integer> currentOrder, ArrayList<Voucher> vouchers) {
+    public static OrderFragment newInstance(HashMap<Product, Integer> currentOrder, ArrayList<Voucher> vouchers) {
         OrderFragment fragment = new OrderFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_ORDER_CONTENT, currentOrder);
@@ -76,7 +73,7 @@ public class OrderFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mCurrentOrder = (HashMap<CafeItem, Integer>) getArguments().getSerializable(ARG_ORDER_CONTENT);
+            mCurrentOrder = (HashMap<Product, Integer>) getArguments().getSerializable(ARG_ORDER_CONTENT);
             mOrderVouchers = (ArrayList<Voucher>) getArguments().getSerializable(ARG_ORDER_VOUCHERS);
         }
     }
@@ -165,8 +162,8 @@ public class OrderFragment extends Fragment {
                     JSONArray products = new JSONArray();
                     for(int i = 0; i < mCurrentOrder.size(); i++) {
                         JSONObject product = new JSONObject();
-                        CafeItem item = (CafeItem) mCurrentOrder.keySet().toArray()[i];
-                        product.put("id", item.getId());
+                        Product item = (Product) mCurrentOrder.keySet().toArray()[i];
+                        product.put("id", item.getProductId());
                         product.put("name", item.getName());
                         product.put("price", item.getPrice());
                         product.put("quantity", mCurrentOrder.get(item));
@@ -307,7 +304,7 @@ public class OrderFragment extends Fragment {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                final CafeItem item = (CafeItem) mCurrentOrder.keySet().toArray()[viewHolder.getAdapterPosition()];
+                final Product item = (Product) mCurrentOrder.keySet().toArray()[viewHolder.getAdapterPosition()];
                 mListener.onItemHardRemove(item, viewHolder.getAdapterPosition(), rv.getAdapter());
 
                 /*
@@ -442,9 +439,9 @@ public class OrderFragment extends Fragment {
     }
 
     public interface OnOrderItemInteracionListener {
-        void onItemRemove(CafeItem item, int pos, RecyclerView.Adapter adapter);
+        void onItemRemove(Product item, int pos, RecyclerView.Adapter adapter);
 
-        void onItemHardRemove(CafeItem item, int pos, RecyclerView.Adapter adapter);
+        void onItemHardRemove(Product item, int pos, RecyclerView.Adapter adapter);
     }
 
     public interface OnOrderVoucherInteractionListener {
