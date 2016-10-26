@@ -183,6 +183,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onItemHardRemove(CafeItem item, int pos, RecyclerView.Adapter adapter) {
+        mCurrentOrder.remove(item);
+        adapter.notifyItemRemoved(pos);
+    }
+
+    @Override
     public void onVoucherAdded(Voucher voucher, int pos, RecyclerView.Adapter adapter) {
         voucher.setIsUsed(true);
         mOrderVouchers.add(voucher);
