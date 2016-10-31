@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onVoucherAdded(Voucher voucher, int pos, RecyclerView.Adapter adapter) {
         voucher.setIsUsed(true);
+        voucher.save();
         mOrderVouchers.add(voucher);
         adapter.notifyItemChanged(pos);
 
@@ -206,6 +207,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onVoucherRemove(Voucher item, int pos, RecyclerView.Adapter adapter) {
         item.setIsUsed(false);
+        item.save();
         this.mOrderVouchers.remove(item);
         adapter.notifyItemRemoved(pos);
     }

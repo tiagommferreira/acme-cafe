@@ -1,44 +1,46 @@
 package org.feup.cmov.acmecafe.Models;
 
+import com.orm.SugarRecord;
+
 import java.io.Serializable;
 
-public class Voucher implements Serializable {
-    private int mId;
-    private int mType;
-    private String mName;
-    private String mSignature;
-    private boolean mIsUsed;
+public class Voucher extends SugarRecord implements Serializable {
+    private int voucherId;
+    private int type;
+    private String name;
+    private String signature;
+    private boolean isUsed;
 
     public Voucher(int id, int type, String name, String signature) {
-        this.mId = id;
-        this.mType = type;
-        this.mName = name;
-        this.mSignature = signature;
-        this.mIsUsed = false;
+        this.voucherId = id;
+        this.type = type;
+        this.name = name;
+        this.signature = signature;
+        this.isUsed = false;
     }
 
-    public int getId() {
-        return mId;
+    public int getVoucherId() {
+        return voucherId;
     }
 
     public int getType() {
-        return mType;
+        return type;
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
     public String getSignature() {
-        return mSignature;
+        return signature;
     }
 
     public boolean getIsUsed() {
-        return  mIsUsed;
+        return isUsed;
     }
 
     public void setIsUsed(boolean isUsed) {
-        this.mIsUsed = isUsed;
+        this.isUsed = isUsed;
     }
 
 }

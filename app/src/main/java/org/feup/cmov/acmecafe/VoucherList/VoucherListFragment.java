@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.feup.cmov.acmecafe.MainActivity;
+import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
 import org.feup.cmov.acmecafe.VolleySingleton;
@@ -72,6 +73,8 @@ public class VoucherListFragment extends Fragment {
             mVoucherListAdapter = new VoucherListAdapter(mVouchers, mListener);
             recyclerView.setAdapter(mVoucherListAdapter);
 
+            mVouchers.addAll(Voucher.listAll(Voucher.class));
+
             mSwipeRefreshLayout = (SwipeRefreshLayout) view;
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
@@ -79,8 +82,7 @@ public class VoucherListFragment extends Fragment {
                     attemptGetVouchers();
                 }
             });
-            if(mVouchers.size() == 0)
-                attemptGetVouchers();
+
         }
 
         return view;
@@ -92,7 +94,7 @@ public class VoucherListFragment extends Fragment {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
             mSwipeRefreshLayout.setRefreshing(false);
-            Snackbar.make(getActivity().getCurrentFocus(), "Check your Internet connection", Snackbar.LENGTH_LONG)
+            Snackbar.make(getView(), "Check your Internet connection", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return;
         }
@@ -107,10 +109,12 @@ public class VoucherListFragment extends Fragment {
                     @Override
                     public void onResponse(JSONArray response) {
                         mVouchers.clear();
+                        Voucher.deleteAll(Voucher.class);
                         for(int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject object = (JSONObject) response.get(i);
                                 Voucher voucher = new Voucher(object.getInt("voucher_id"), object.getInt("type"), object.getString("name"), object.getString("signature"));
+                                voucher.save();
                                 mVouchers.add(voucher);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -157,6 +161,8 @@ public class VoucherListFragment extends Fragment {
         super.onResume();
         MainActivity activity = (MainActivity) getActivity();
         activity.setToolbarTitle("Vouchers");
+        if(mVouchers.size() == 0)
+            attemptGetVouchers();
     }
 
     private String getUserUUID() {

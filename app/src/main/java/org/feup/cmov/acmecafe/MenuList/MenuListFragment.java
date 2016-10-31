@@ -74,8 +74,6 @@ public class MenuListFragment extends Fragment {
                     attemptGetMenu();
                 }
             });
-
-            //attemptGetMenu();
         }
 
         return view;
@@ -107,6 +105,7 @@ public class MenuListFragment extends Fragment {
         super.onResume();
         MainActivity activity = (MainActivity) getActivity();
         activity.setToolbarTitle("Menu");
+        attemptGetMenu();
     }
 
     public void attemptGetMenu() {
@@ -115,7 +114,7 @@ public class MenuListFragment extends Fragment {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
             mSwipeRefreshLayout.setRefreshing(false);
-            Snackbar.make(getActivity().getCurrentFocus(), "Check your Internet connection", Snackbar.LENGTH_LONG)
+            Snackbar.make(getView(), "Check your Internet connection", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return;
         }

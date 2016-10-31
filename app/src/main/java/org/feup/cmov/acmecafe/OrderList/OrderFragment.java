@@ -175,7 +175,7 @@ public class OrderFragment extends Fragment {
                     for(int i = 0; i < mOrderVouchers.size(); i++) {
                         JSONObject voucher = new JSONObject();
                         Voucher item = mOrderVouchers.get(i);
-                        voucher.put("id", item.getId());
+                        voucher.put("id", item.getVoucherId());
                         voucher.put("name", item.getName());
                         voucher.put("type", item.getType());
                         voucher.put("signature", item.getSignature());

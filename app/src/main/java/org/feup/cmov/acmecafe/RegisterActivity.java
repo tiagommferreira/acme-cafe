@@ -248,7 +248,7 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
-                        Log.d("Register", error.getMessage());
+                        Log.d("Register", error.toString());
                     }
                 });
         jsObjRequest.setTag(REGISTER_TAG);
