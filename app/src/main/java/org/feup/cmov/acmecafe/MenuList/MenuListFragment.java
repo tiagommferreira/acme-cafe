@@ -65,6 +65,7 @@ public class MenuListFragment extends Fragment {
             mMenuListAdapter = new MenuListAdapter(mMenuItems, mListener);
             recyclerView.setAdapter(mMenuListAdapter);
 
+            mMenuItems.clear();
             mMenuItems.addAll(Product.listAll(Product.class));
 
             mSwipeRefreshLayout = (SwipeRefreshLayout) view;
@@ -105,7 +106,8 @@ public class MenuListFragment extends Fragment {
         super.onResume();
         MainActivity activity = (MainActivity) getActivity();
         activity.setToolbarTitle("Menu");
-        attemptGetMenu();
+        if(mMenuItems.size() == 0)
+            attemptGetMenu();
     }
 
     public void attemptGetMenu() {

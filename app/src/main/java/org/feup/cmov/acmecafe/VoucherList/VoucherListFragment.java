@@ -73,6 +73,7 @@ public class VoucherListFragment extends Fragment {
             mVoucherListAdapter = new VoucherListAdapter(mVouchers, mListener);
             recyclerView.setAdapter(mVoucherListAdapter);
 
+            mVouchers.clear();
             mVouchers.addAll(Voucher.listAll(Voucher.class));
 
             mSwipeRefreshLayout = (SwipeRefreshLayout) view;

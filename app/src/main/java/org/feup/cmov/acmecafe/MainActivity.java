@@ -1,5 +1,6 @@
 package org.feup.cmov.acmecafe;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,8 @@ import org.feup.cmov.acmecafe.MenuList.MenuListFragment;
 import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.OrderList.OrderFragment;
+import org.feup.cmov.acmecafe.OrderList.OrderVoucherAdapter;
+import org.feup.cmov.acmecafe.PastTransactions.PastTransactionsFragment;
 import org.feup.cmov.acmecafe.VoucherList.VoucherListFragment;
 
 import java.util.ArrayList;
@@ -29,7 +32,8 @@ public class MainActivity extends AppCompatActivity
         MenuListFragment.OnMenuListInteractionListener,
         OrderFragment.OnOrderItemInteracionListener,
         OrderFragment.OnOrderVoucherInteractionListener,
-        VoucherListFragment.OnVoucherInteractionListener {
+        VoucherListFragment.OnVoucherInteractionListener,
+        PastTransactionsFragment.OnPastTranscationInteractionListener {
 
     HashMap<Product,Integer> mCurrentOrder = new HashMap<>();
     ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
@@ -122,7 +126,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_vouchers) {
             fragmentClass = VoucherListFragment.class;
         } else if (id == R.id.nav_past_transactions) {
-
+            fragmentClass = PastTransactionsFragment.class;
         }
 
         try {
@@ -210,5 +214,10 @@ public class MainActivity extends AppCompatActivity
         item.save();
         this.mOrderVouchers.remove(item);
         adapter.notifyItemRemoved(pos);
+    }
+
+    @Override
+    public void onOrderInteraction(Uri uri) {
+
     }
 }
