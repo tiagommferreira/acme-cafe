@@ -63,6 +63,7 @@ public class OrderFragment extends Fragment {
 
     private TextView mPriceTextView;
 
+    private Button mQRCodeButton;
     private ImageView mQRCodeImageView;
     private View mProgressView;
 
@@ -116,13 +117,16 @@ public class OrderFragment extends Fragment {
         //progress view while generating qr code
         mProgressView = view.findViewById(R.id.qr_code_progress);
 
-        Button generateQRCodeButton = (Button) view.findViewById(R.id.qr_code_button);
-        generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
+        mQRCodeButton = (Button) view.findViewById(R.id.qr_code_button);
+        mQRCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 askUserForPIN();
             }
         });
+        if(mCurrentOrder.isEmpty()) {
+            mQRCodeButton.setEnabled(false);
+        }
 
         return view;
     }
@@ -171,6 +175,7 @@ public class OrderFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if(Integer.parseInt(pinEditText.getText().toString()) == getUserPIN()) {
+                            mQRCodeButton.setEnabled(false);
                             showProgress(true);
                             generateQRCode();
                         }
@@ -241,6 +246,7 @@ public class OrderFragment extends Fragment {
                         @Override
                         public void run() {
                             showProgress(false);
+                            mQRCodeButton.setEnabled(true);
                             mQRCodeImageView.setImageBitmap(bitmap);
                         }
                     });
