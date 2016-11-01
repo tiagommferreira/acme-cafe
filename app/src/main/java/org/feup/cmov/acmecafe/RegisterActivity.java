@@ -131,9 +131,6 @@ public class RegisterActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptRegister() {
-        //if (mAuthTask != null) {
-        //    return;
-        //}
 
         //If the user does not have an Internet connection, do not try to register
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -54,6 +54,16 @@
             android:layout_height="wrap_content"
             android:text="Generate QRCode" />
 
+        <!-- Register progress -->
+        <ProgressBar
+            android:id="@+id/qr_code_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
+
         <ImageView
             android:id="@+id/qr_code_image"
             android:layout_width="match_parent"

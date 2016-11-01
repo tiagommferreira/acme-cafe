@@ -1,5 +1,8 @@
 package org.feup.cmov.acmecafe.OrderList;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -9,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -58,6 +62,7 @@ public class OrderFragment extends Fragment {
     private RecyclerView.Adapter mOrderVoucherListAdapter;
 
     private ImageView mQRCodeImageView;
+    private View mProgressView;
 
     public OrderFragment() {
     }
@@ -101,6 +106,8 @@ public class OrderFragment extends Fragment {
 
         //qrcode image
         mQRCodeImageView = (ImageView) view.findViewById(R.id.qr_code_image);
+        //progress view while generating qr code
+        mProgressView = view.findViewById(R.id.qr_code_progress);
 
         Button generateQRCodeButton = (Button) view.findViewById(R.id.qr_code_button);
         generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +134,7 @@ public class OrderFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if(Integer.parseInt(pinEditText.getText().toString()) == getUserPIN()) {
+                            showProgress(true);
                             generateQRCode();
                         }
                         else {
@@ -195,6 +203,7 @@ public class OrderFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            showProgress(false);
                             mQRCodeImageView.setImageBitmap(bitmap);
                         }
                     });
@@ -265,6 +274,39 @@ public class OrderFragment extends Fragment {
         super.onResume();
         MainActivity activity = (MainActivity) getActivity();
         activity.setToolbarTitle("Current Order");
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mQRCodeImageView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mQRCodeImageView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mQRCodeImageView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mQRCodeImageView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 
     private void setUpItemTouchHelper(final RecyclerView rv) {
