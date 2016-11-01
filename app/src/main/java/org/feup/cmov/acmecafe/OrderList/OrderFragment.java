@@ -22,13 +22,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.MainActivity;
@@ -55,11 +55,13 @@ public class OrderFragment extends Fragment {
     private HashMap<Product, Integer> mCurrentOrder = new HashMap<>();
     private ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
 
-    private OnOrderItemInteracionListener mListener;
+    private OnOrderItemInteractionListener mListener;
     private OnOrderVoucherInteractionListener mVoucherListener;
 
     private RecyclerView.Adapter mOrderListAdapter;
     private RecyclerView.Adapter mOrderVoucherListAdapter;
+
+    private TextView mPriceTextView;
 
     private ImageView mQRCodeImageView;
     private View mProgressView;
@@ -90,10 +92,13 @@ public class OrderFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_order, container, false);
 
+        //price text view
+        mPriceTextView = (TextView) view.findViewById(R.id.order_price);
+
         //set up the products recycler view
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.order_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        mOrderListAdapter = new OrderAdapter(mCurrentOrder, mListener);
+        mOrderListAdapter = new OrderAdapter(mCurrentOrder, mListener, mPriceTextView);
         recyclerView.setAdapter(mOrderListAdapter);
         setUpItemTouchHelper(recyclerView);
         setUpAnimationDecoratorHelper(recyclerView);
@@ -101,8 +106,10 @@ public class OrderFragment extends Fragment {
         //set up the vouchers recycler view
         RecyclerView voucherRecyclerView = (RecyclerView) view.findViewById(R.id.order_voucher_list);
         voucherRecyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        mOrderVoucherListAdapter = new OrderVoucherAdapter(mOrderVouchers, mVoucherListener);
+        mOrderVoucherListAdapter = new OrderVoucherAdapter(mOrderVouchers, mVoucherListener, mPriceTextView);
         voucherRecyclerView.setAdapter(mOrderVoucherListAdapter);
+
+        calculateOrderPrice(mCurrentOrder, mOrderVouchers, mPriceTextView);
 
         //qrcode image
         mQRCodeImageView = (ImageView) view.findViewById(R.id.qr_code_image);
@@ -118,6 +125,36 @@ public class OrderFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public static void calculateOrderPrice(HashMap<Product, Integer> products, ArrayList<Voucher> vouchers, TextView tv) {
+        float price = 0f;
+        float popcornPrice = 0f;
+        float coffeePrice = 0f;
+
+        for(Product p : products.keySet()) {
+            price += p.getPrice() * products.get(p);
+            if(p.getName().equals("Popcorn")) {
+                popcornPrice = p.getPrice();
+            }
+            else if(p.getName().equals("Coffee")) {
+                coffeePrice = p.getPrice();
+            }
+        }
+
+        for(Voucher v : vouchers) {
+            if(v.getType() == 1) {
+                price -= popcornPrice;
+            }
+            else if(v.getType() == 2) {
+                price -= coffeePrice;
+            }
+            else if(v.getType() == 3) {
+                price -= ((5*price)/100);
+            }
+        }
+
+        tv.setText("Total: " + String.valueOf(price) + "€");
     }
 
     private void askUserForPIN() {
@@ -254,12 +291,12 @@ public class OrderFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnOrderItemInteracionListener && context instanceof OnOrderVoucherInteractionListener) {
-            mListener = (OnOrderItemInteracionListener) context;
+        if (context instanceof OnOrderItemInteractionListener && context instanceof OnOrderVoucherInteractionListener) {
+            mListener = (OnOrderItemInteractionListener) context;
             mVoucherListener = (OnOrderVoucherInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnOrderItemInteracionListener and OnOrderVoucherInteractionListener");
+                    + " must implement OnOrderItemInteractionListener and OnOrderVoucherInteractionListener");
         }
     }
 
@@ -352,7 +389,7 @@ public class OrderFragment extends Fragment {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mListener.onItemHardRemove(item, viewHolder.getAdapterPosition(), rv.getAdapter());
+                        mListener.onItemHardRemove(item, viewHolder.getAdapterPosition(), rv.getAdapter(), mPriceTextView);
                     }
                 }, 300);
 
@@ -494,13 +531,12 @@ public class OrderFragment extends Fragment {
         });
     }
 
-    public interface OnOrderItemInteracionListener {
-        void onItemRemove(Product item, int pos, RecyclerView.Adapter adapter);
-
-        void onItemHardRemove(Product item, int pos, RecyclerView.Adapter adapter);
+    public interface OnOrderItemInteractionListener {
+        void onItemRemove(Product item, int pos, RecyclerView.Adapter adapter, TextView priceTV);
+        void onItemHardRemove(Product item, int pos, RecyclerView.Adapter adapter, TextView priceTV);
     }
 
     public interface OnOrderVoucherInteractionListener {
-        void onVoucherRemove(Voucher item, int pos, RecyclerView.Adapter adapter);
+        void onVoucherRemove(Voucher item, int pos, RecyclerView.Adapter adapter, TextView priceTV);
     }
 }

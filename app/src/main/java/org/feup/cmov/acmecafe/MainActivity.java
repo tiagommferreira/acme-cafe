@@ -15,12 +15,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import org.feup.cmov.acmecafe.MenuList.MenuListFragment;
 import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.OrderList.OrderFragment;
-import org.feup.cmov.acmecafe.OrderList.OrderVoucherAdapter;
 import org.feup.cmov.acmecafe.PastTransactions.PastTransactionsFragment;
 import org.feup.cmov.acmecafe.VoucherList.VoucherListFragment;
 
@@ -30,7 +30,7 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MenuListFragment.OnMenuListInteractionListener,
-        OrderFragment.OnOrderItemInteracionListener,
+        OrderFragment.OnOrderItemInteractionListener,
         OrderFragment.OnOrderVoucherInteractionListener,
         VoucherListFragment.OnVoucherInteractionListener,
         PastTransactionsFragment.OnPastTranscationInteractionListener {
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemRemove(Product item, int pos, RecyclerView.Adapter adapter) {
+    public void onItemRemove(Product item, int pos, RecyclerView.Adapter adapter, TextView priceTV) {
         if(mCurrentOrder.get(item) > 1) {
             mCurrentOrder.put(item, mCurrentOrder.get(item) - 1);
             adapter.notifyItemChanged(pos);
@@ -183,12 +183,14 @@ public class MainActivity extends AppCompatActivity
             mCurrentOrder.remove(item);
             adapter.notifyItemRemoved(pos);
         }
+        OrderFragment.calculateOrderPrice(mCurrentOrder, mOrderVouchers, priceTV);
     }
 
     @Override
-    public void onItemHardRemove(Product item, int pos, RecyclerView.Adapter adapter) {
+    public void onItemHardRemove(Product item, int pos, RecyclerView.Adapter adapter, TextView priceTV) {
         mCurrentOrder.remove(item);
         adapter.notifyItemRemoved(pos);
+        OrderFragment.calculateOrderPrice(mCurrentOrder, mOrderVouchers, priceTV);
     }
 
     @Override
@@ -209,11 +211,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onVoucherRemove(Voucher item, int pos, RecyclerView.Adapter adapter) {
+    public void onVoucherRemove(Voucher item, int pos, RecyclerView.Adapter adapter, TextView priceTV) {
         item.setIsUsed(false);
         item.save();
         this.mOrderVouchers.remove(item);
         adapter.notifyItemRemoved(pos);
+        OrderFragment.calculateOrderPrice(mCurrentOrder, mOrderVouchers, priceTV);
     }
 
     @Override

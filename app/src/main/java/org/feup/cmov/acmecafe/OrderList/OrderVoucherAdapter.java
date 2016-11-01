@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapter.ViewHolder> {
     private ArrayList<Voucher> mDataset;
+    private TextView mPriceTV;
     private OrderFragment.OnOrderVoucherInteractionListener mListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -26,9 +27,10 @@ public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapte
         }
     }
 
-    public OrderVoucherAdapter(ArrayList<Voucher> vouchers, OrderFragment.OnOrderVoucherInteractionListener listener) {
+    public OrderVoucherAdapter(ArrayList<Voucher> vouchers, OrderFragment.OnOrderVoucherInteractionListener listener, TextView mPriceTextView) {
         this.mDataset = vouchers;
         this.mListener = listener;
+        this.mPriceTV = mPriceTextView;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapte
         holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onVoucherRemove(voucher, position, adapter);
+                mListener.onVoucherRemove(voucher, position, adapter, mPriceTV);
             }
         });
     }

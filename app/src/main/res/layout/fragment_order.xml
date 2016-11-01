@@ -48,6 +48,16 @@
             tools:context="org.feup.cmov.acmecafe.OrderList.OrderFragment"
             tools:listitem="@layout/voucher_list_item" />
 
+        <TextView
+            android:id="@+id/order_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: 20.57€"
+            android:textSize="20sp"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"/>
+
+
         <Button
             android:id="@+id/qr_code_button"
             android:layout_width="match_parent"
