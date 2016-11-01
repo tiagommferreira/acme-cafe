@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -277,7 +279,7 @@ public class OrderFragment extends Fragment {
 
             private void init() {
                 background = new ColorDrawable(Color.RED);
-                xMark = ContextCompat.getDrawable(getActivity(), R.drawable.ic_menu_manage);
+                xMark = ContextCompat.getDrawable(getActivity(), R.drawable.ic_remove_all);
                 xMark.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                 xMarkMargin = (int) getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
                 initiated = true;
@@ -303,9 +305,14 @@ public class OrderFragment extends Fragment {
             }
 
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 final Product item = (Product) mCurrentOrder.keySet().toArray()[viewHolder.getAdapterPosition()];
-                mListener.onItemHardRemove(item, viewHolder.getAdapterPosition(), rv.getAdapter());
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onItemHardRemove(item, viewHolder.getAdapterPosition(), rv.getAdapter());
+                    }
+                }, 300);
 
                 /*
                 int swipedPosition = viewHolder.getAdapterPosition();
@@ -347,6 +354,13 @@ public class OrderFragment extends Fragment {
                 int xMarkTop = itemView.getTop() + (itemHeight - intrinsicHeight)/2;
                 int xMarkBottom = xMarkTop + intrinsicHeight;
                 xMark.setBounds(xMarkLeft, xMarkTop, xMarkRight, xMarkBottom);
+
+                if(dX == 0 && dY == 0) {
+                    xMark.setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                }
+                else {
+                    xMark.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                }
 
                 xMark.draw(c);
 
