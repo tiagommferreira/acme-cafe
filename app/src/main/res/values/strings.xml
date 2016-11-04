@@ -35,4 +35,5 @@
     <string name="dialog_ask_PIN_title">Please enter your PIN</string>
     <string name="user_details_prefs">org.feup.cmov.acmecafe.USER_DETAILS</string>
     <string name="dialog_ask_password_title">Please insert your password</string>
+    <string name="action_authenticate">Authenticate</string>
 </resources>

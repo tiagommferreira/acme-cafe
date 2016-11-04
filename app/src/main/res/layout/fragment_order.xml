@@ -15,7 +15,8 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:gravity="center_vertical"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -35,7 +36,8 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:gravity="center_vertical"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -55,16 +57,19 @@
             android:text="Total: 20.57€"
             android:textSize="20sp"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"/>
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:textStyle="bold"/>
 
 
         <Button
             android:id="@+id/qr_code_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Generate QRCode" />
+            android:text="Generate QRCode"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-        <!-- Register progress -->
+        <!-- QRCode progress -->
         <ProgressBar
             android:id="@+id/qr_code_progress"
             style="?android:attr/progressBarStyleLarge"

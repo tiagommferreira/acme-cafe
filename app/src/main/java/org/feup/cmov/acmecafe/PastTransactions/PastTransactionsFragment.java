@@ -1,20 +1,26 @@
 package org.feup.cmov.acmecafe.PastTransactions;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.android.volley.Request;
@@ -35,6 +41,12 @@ public class PastTransactionsFragment extends Fragment {
 
     private OnPastTranscationInteractionListener mListener;
 
+    private View mAuthenticateForm;
+    private EditText mAskPasswordField;
+    private Button mAuthenticateButton;
+    private View mProgressView;
+    private RecyclerView mRecyclerView;
+
     public PastTransactionsFragment() {
     }
 
@@ -50,8 +62,22 @@ public class PastTransactionsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_past_transactions, container, false);
+        View view = inflater.inflate(R.layout.fragment_past_transactions, container, false);
+
+        mAuthenticateForm = view.findViewById(R.id.authenticate_form);
+        mAskPasswordField = (EditText) mAuthenticateForm.findViewById(R.id.ask_password_input);
+        mAuthenticateButton = (Button) mAuthenticateForm.findViewById(R.id.authenticate_button);
+        mAuthenticateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProgress(true, false);
+                attemptAuthenticate(mAskPasswordField.getText().toString());
+            }
+        });
+        mProgressView = view.findViewById(R.id.authentication_progress);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.past_transactions_list);
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -85,52 +111,22 @@ public class PastTransactionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        askUserForPassword();
     }
 
-    private void askUserForPassword() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-        LayoutInflater inflater = this.getActivity().getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_ask_password, null);
-
-        final EditText passwordEditText = (EditText) dialogView.findViewById(R.id.ask_password_input);
-
-        builder.setTitle(R.string.dialog_ask_password_title)
-                .setView(dialogView)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        attemptAuthenticate(dialog, passwordEditText.getText().toString());
-                    }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        getActivity().getSupportFragmentManager().popBackStackImmediate();
-                    }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void attemptAuthenticate(DialogInterface dialog, String password) {
+    private void attemptAuthenticate(String password) {
         //If the user does not have an Internet connection, do not try to get the Voucher list
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
             Snackbar.make(getView(), "Check your Internet connection", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            dialog.dismiss();
             getActivity().getSupportFragmentManager().popBackStackImmediate();
             return;
         }
-
-        authenticate(dialog, password);
+        authenticate(password);
     }
 
-    private void authenticate(final DialogInterface dialog, String password) {
+    private void authenticate(String password) {
         String url = "https://acme-cafe.herokuapp.com/authenticate";
 
         JSONObject body = new JSONObject();
@@ -147,10 +143,11 @@ public class PastTransactionsFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             if(response.getBoolean("success")) {
-                                dialog.dismiss();
+                                showProgress(false, true);
                             }
                             else {
-                                //TODO: notify user wrong password
+                                showProgress(false, false);
+                                mAskPasswordField.setError("Wrong Password");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -172,6 +169,41 @@ public class PastTransactionsFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.user_details_prefs),Context.MODE_PRIVATE);
         String defaultValue = "Could not get UUID from shared preferences";
         return sharedPref.getString("uuid", defaultValue);
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show, boolean success) {
+        final View otherView = success ? mRecyclerView : mAuthenticateForm;
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            otherView.setVisibility(show ? View.GONE : View.VISIBLE);
+            otherView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    otherView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            otherView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 
     public interface OnPastTranscationInteractionListener {
