@@ -55,12 +55,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         final RecyclerView.Adapter adapter = this;
         holder.mNameTextView.setText(item.getName());
         holder.mPriceTextView.setText("Quantity: " + String.valueOf(mDataset.get(item)));
-        holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onItemRemove(item, position, adapter,mPriceTV);
-            }
-        });
+        if(mListener != null) {
+            holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onItemRemove(item, position, adapter,mPriceTV);
+                }
+            });
+        }
+        else {
+            holder.mRemoveImageView.setBackground(null);
+        }
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)

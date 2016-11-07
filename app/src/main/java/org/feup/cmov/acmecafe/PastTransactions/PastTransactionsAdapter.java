@@ -19,10 +19,12 @@ public class PastTransactionsAdapter extends RecyclerView.Adapter<PastTransactio
     private final PastTransactionsFragment.OnPastTransactionInteractionListener mListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
+        final View mCapsule;
         final TextView mIdTextView;
         final TextView mPriceTextView;
         ViewHolder(View v) {
             super(v);
+            mCapsule = v;
             mIdTextView = (TextView) v.findViewById(R.id.past_transaction_id);
             mPriceTextView = (TextView) v.findViewById(R.id.past_transaction_price);
         }
@@ -51,6 +53,12 @@ public class PastTransactionsAdapter extends RecyclerView.Adapter<PastTransactio
         final Order item = mDataset.get(position);
         holder.mIdTextView.setText("Order " + item.getId());
         holder.mPriceTextView.setText(calculateOrderPrice(item.getProducts(), item.getVouchers()) + "€");
+        holder.mCapsule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onOrderInteraction(item);
+            }
+        });
     }
 
     private float calculateOrderPrice(HashMap<Product,Integer> products, ArrayList<Voucher> vouchers) {

@@ -1,5 +1,6 @@
 package org.feup.cmov.acmecafe;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -222,6 +224,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onOrderInteraction(Order order) {
-
+        Intent intent = new Intent(this, OrderDetailsActivity.class);
+        intent.putExtra("order", order);
+        startActivity(intent);
     }
 }

@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -185,8 +186,8 @@ public class PastTransactionsFragment extends Fragment {
     }
 
     private void getTransactions() {
-        //String url = "https://acme-cafe.herokuapp.com/order/" + getUserUUID();
-        String url = "https://acme-cafe.herokuapp.com/order/user-uuid-melacionismo-1234";
+        String url = "https://acme-cafe.herokuapp.com/order/" + getUserUUID();
+        //String url = "https://acme-cafe.herokuapp.com/order/user-uuid-melacionismo-1234";
 
         JsonArrayRequest jsObjRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -238,7 +239,6 @@ public class PastTransactionsFragment extends Fragment {
         return sharedPref.getString("uuid", defaultValue);
     }
 
-
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show, boolean success) {
         final View otherView = success ? mRecyclerView : mAuthenticateForm;
@@ -272,8 +272,6 @@ public class PastTransactionsFragment extends Fragment {
             otherView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
-
-
 
     public interface OnPastTransactionInteractionListener {
         void onOrderInteraction(Order order);

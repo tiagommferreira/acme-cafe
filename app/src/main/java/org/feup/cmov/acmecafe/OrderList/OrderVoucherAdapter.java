@@ -48,12 +48,18 @@ public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapte
         holder.mNameTextView.setText(voucher.getName());
 
         final RecyclerView.Adapter adapter = this;
-        holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onVoucherRemove(voucher, position, adapter, mPriceTV);
-            }
-        });
+        if(mListener != null) {
+            holder.mRemoveImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onVoucherRemove(voucher, position, adapter, mPriceTV);
+                }
+            });
+        }
+        else {
+            holder.mRemoveImageView.setBackground(null);
+        }
+
     }
 
     @Override

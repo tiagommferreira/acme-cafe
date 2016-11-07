@@ -1,9 +1,10 @@
 package org.feup.cmov.acmecafe.Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Order {
+public class Order implements Serializable {
     private int mId;
     private HashMap<Product, Integer> mProducts = new HashMap<>();
     private ArrayList<Voucher> mVouchers = new ArrayList<>();
