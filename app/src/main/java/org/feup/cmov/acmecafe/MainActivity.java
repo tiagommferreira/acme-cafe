@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import org.feup.cmov.acmecafe.MenuList.MenuListFragment;
+import org.feup.cmov.acmecafe.Models.Order;
 import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.OrderList.OrderFragment;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity
         OrderFragment.OnOrderItemInteractionListener,
         OrderFragment.OnOrderVoucherInteractionListener,
         VoucherListFragment.OnVoucherInteractionListener,
-        PastTransactionsFragment.OnPastTranscationInteractionListener {
+        PastTransactionsFragment.OnPastTransactionInteractionListener {
 
     HashMap<Product,Integer> mCurrentOrder = new HashMap<>();
     ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
@@ -220,7 +221,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onOrderInteraction(Uri uri) {
+    public void onOrderInteraction(Order order) {
 
     }
 }

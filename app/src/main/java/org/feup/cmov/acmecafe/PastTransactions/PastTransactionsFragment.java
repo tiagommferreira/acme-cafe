@@ -4,18 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,26 +22,38 @@ import android.widget.EditText;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.feup.cmov.acmecafe.MainActivity;
+import org.feup.cmov.acmecafe.Models.Order;
+import org.feup.cmov.acmecafe.Models.Product;
+import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
 import org.feup.cmov.acmecafe.VolleySingleton;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class PastTransactionsFragment extends Fragment {
 
     private static final String AUTHENTICATE_TAG = "AUTHENTICATE";
+    private static final String TRANSACTIONS_TAG = "TRANSACTIONS";
 
-    private OnPastTranscationInteractionListener mListener;
+    private ArrayList<Order> mPastTransactions = new ArrayList<>();
+
+    private OnPastTransactionInteractionListener mListener;
 
     private View mAuthenticateForm;
     private EditText mAskPasswordField;
     private Button mAuthenticateButton;
     private View mProgressView;
     private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mPastTransactionsAdapter;
 
     public PastTransactionsFragment() {
     }
@@ -76,25 +84,20 @@ public class PastTransactionsFragment extends Fragment {
         });
         mProgressView = view.findViewById(R.id.authentication_progress);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.past_transactions_list);
+        mPastTransactionsAdapter = new PastTransactionsAdapter(mPastTransactions, mListener);
+        mRecyclerView.setAdapter(mPastTransactionsAdapter);
 
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onOrderInteraction(uri);
-        }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnPastTranscationInteractionListener) {
-            mListener = (OnPastTranscationInteractionListener) context;
+        if (context instanceof OnPastTransactionInteractionListener) {
+            mListener = (OnPastTransactionInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnPastTranscationInteractionListener");
+                    + " must implement OnPastTransactionInteractionListener");
         }
     }
 
@@ -111,6 +114,8 @@ public class PastTransactionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity activity = (MainActivity) getActivity();
+        activity.setToolbarTitle("Past Transactions");
     }
 
     private void attemptAuthenticate(String password) {
@@ -143,7 +148,7 @@ public class PastTransactionsFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             if(response.getBoolean("success")) {
-                                showProgress(false, true);
+                                attemptGetTransactions();
                             }
                             else {
                                 showProgress(false, false);
@@ -162,6 +167,68 @@ public class PastTransactionsFragment extends Fragment {
                 });
 
         jsObjRequest.setTag(AUTHENTICATE_TAG);
+        VolleySingleton.getInstance(this.getActivity().getApplicationContext()).addToRequestQueue(jsObjRequest);
+    }
+
+    private void attemptGetTransactions() {
+        //If the user does not have an Internet connection, do not try to get the Voucher list
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
+            Snackbar.make(getView(), "Check your Internet connection", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            getActivity().getSupportFragmentManager().popBackStackImmediate();
+            return;
+        }
+
+        getTransactions();
+    }
+
+    private void getTransactions() {
+        //String url = "https://acme-cafe.herokuapp.com/order/" + getUserUUID();
+        String url = "https://acme-cafe.herokuapp.com/order/user-uuid-melacionismo-1234";
+
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            for(int i = 0; i < response.length(); i++) {
+                                JSONObject current = response.getJSONObject(i);
+                                HashMap<Product, Integer> products = new HashMap<>();
+                                ArrayList<Voucher> vouchers = new ArrayList<>();
+
+                                JSONArray productsJSON = current.getJSONArray("products");
+                                for(int j = 0; j < productsJSON.length(); j++) {
+                                    JSONObject currentProduct = productsJSON.getJSONObject(j);
+                                    products.put(new Product(currentProduct.getInt("id"), currentProduct.getString("name"), (float) currentProduct.getDouble("price")), currentProduct.getInt("quantity"));
+                                }
+
+                                JSONArray vouchersJSON = current.getJSONArray("vouchers");
+                                for(int k = 0; k < vouchersJSON.length(); k++) {
+                                    JSONObject currentVoucher = vouchersJSON.getJSONObject(k);
+                                    vouchers.add(new Voucher(currentVoucher.getInt("id"), currentVoucher.getInt("type"), currentVoucher.getString("name"),null));
+                                }
+
+                                Order order = new Order(current.getInt("id"), products, vouchers);
+                                mPastTransactions.add(order);
+                            }
+                            mPastTransactionsAdapter.notifyDataSetChanged();
+                            showProgress(false, true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("PastTransactions", "Error getting transactions");
+                        getActivity().getSupportFragmentManager().popBackStackImmediate();
+                    }
+                });
+
+        jsObjRequest.setTag(TRANSACTIONS_TAG);
         VolleySingleton.getInstance(this.getActivity().getApplicationContext()).addToRequestQueue(jsObjRequest);
     }
 
@@ -206,8 +273,9 @@ public class PastTransactionsFragment extends Fragment {
         }
     }
 
-    public interface OnPastTranscationInteractionListener {
-        // TODO: Update argument type and name
-        void onOrderInteraction(Uri uri);
+
+
+    public interface OnPastTransactionInteractionListener {
+        void onOrderInteraction(Order order);
     }
 }
