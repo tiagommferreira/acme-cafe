@@ -6,15 +6,12 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,6 +28,7 @@ import org.feup.cmov.acmecafe.Models.Order;
 import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
+import org.feup.cmov.acmecafe.Utils;
 import org.feup.cmov.acmecafe.VolleySingleton;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -120,15 +118,10 @@ public class PastTransactionsFragment extends Fragment {
     }
 
     private void attemptAuthenticate(String password) {
-        //If the user does not have an Internet connection, do not try to get the Voucher list
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
-            Snackbar.make(getView(), "Check your Internet connection", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            getActivity().getSupportFragmentManager().popBackStackImmediate();
+
+        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
             return;
-        }
+
         authenticate(password);
     }
 
@@ -172,15 +165,9 @@ public class PastTransactionsFragment extends Fragment {
     }
 
     private void attemptGetTransactions() {
-        //If the user does not have an Internet connection, do not try to get the Voucher list
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
-            Snackbar.make(getView(), "Check your Internet connection", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            getActivity().getSupportFragmentManager().popBackStackImmediate();
+
+        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
             return;
-        }
 
         getTransactions();
     }

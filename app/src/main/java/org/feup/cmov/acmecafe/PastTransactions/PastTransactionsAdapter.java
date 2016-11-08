@@ -10,6 +10,7 @@ import org.feup.cmov.acmecafe.Models.Order;
 import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
+import org.feup.cmov.acmecafe.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,31 +63,7 @@ public class PastTransactionsAdapter extends RecyclerView.Adapter<PastTransactio
     }
 
     private float calculateOrderPrice(HashMap<Product,Integer> products, ArrayList<Voucher> vouchers) {
-        float price = 0f;
-        float popcornPrice = 0f;
-        float coffeePrice = 0f;
-
-        for(Product p : products.keySet()) {
-            price += p.getPrice() * products.get(p);
-            if(p.getName().equals("Popcorn")) {
-                popcornPrice = p.getPrice();
-            }
-            else if(p.getName().equals("Coffee")) {
-                coffeePrice = p.getPrice();
-            }
-        }
-
-        for(Voucher v : vouchers) {
-            if(v.getType() == 1) {
-                price -= popcornPrice;
-            }
-            else if(v.getType() == 2) {
-                price -= coffeePrice;
-            }
-            else if(v.getType() == 3) {
-                price -= ((5*price)/100);
-            }
-        }
+        float price = Utils.calculateOrderPrice(products, vouchers);
 
         return price;
     }

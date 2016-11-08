@@ -1,20 +1,18 @@
 package org.feup.cmov.acmecafe;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -164,12 +162,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onMenuListInteraction(Product item) {
-        if(mCurrentOrder.containsKey(item)) {
-            mCurrentOrder.put(item, mCurrentOrder.get(item) + 1);
+        boolean found = false;
+        for(Product p : mCurrentOrder.keySet()) {
+            if(p.getProductId() == item.getProductId() && p.getName().equals(item.getName())) {
+                mCurrentOrder.put(p, mCurrentOrder.get(p) + 1);
+                found = true;
+            }
         }
-        else {
+        if(!found)
             mCurrentOrder.put(item, 1);
-        }
 
         Snackbar.make(getCurrentFocus(), "Product " + item.getName() + " added to your current order.", Snackbar.LENGTH_SHORT)
                 .setAction("Action", null).show();

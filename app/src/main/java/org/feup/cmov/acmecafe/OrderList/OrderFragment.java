@@ -30,10 +30,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.feup.cmov.acmecafe.Models.Product;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+
 import org.feup.cmov.acmecafe.MainActivity;
+import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
+import org.feup.cmov.acmecafe.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,11 +47,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
 
 
 public class OrderFragment extends Fragment {
@@ -132,31 +133,7 @@ public class OrderFragment extends Fragment {
     }
 
     public static void calculateOrderPrice(HashMap<Product, Integer> products, ArrayList<Voucher> vouchers, TextView tv) {
-        float price = 0f;
-        float popcornPrice = 0f;
-        float coffeePrice = 0f;
-
-        for(Product p : products.keySet()) {
-            price += p.getPrice() * products.get(p);
-            if(p.getName().equals("Popcorn")) {
-                popcornPrice = p.getPrice();
-            }
-            else if(p.getName().equals("Coffee")) {
-                coffeePrice = p.getPrice();
-            }
-        }
-
-        for(Voucher v : vouchers) {
-            if(v.getType() == 1) {
-                price -= popcornPrice;
-            }
-            else if(v.getType() == 2) {
-                price -= coffeePrice;
-            }
-            else if(v.getType() == 3) {
-                price -= ((5*price)/100);
-            }
-        }
+        float price = Utils.calculateOrderPrice(products, vouchers);
 
         tv.setText("Total: " + String.valueOf(price) + "€");
     }

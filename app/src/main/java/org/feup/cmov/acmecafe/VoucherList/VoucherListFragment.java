@@ -3,9 +3,7 @@ package org.feup.cmov.acmecafe.VoucherList;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,9 +19,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.feup.cmov.acmecafe.MainActivity;
-import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.R;
+import org.feup.cmov.acmecafe.Utils;
 import org.feup.cmov.acmecafe.VolleySingleton;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -90,15 +88,9 @@ public class VoucherListFragment extends Fragment {
     }
 
     private void attemptGetVouchers() {
-        //If the user does not have an Internet connection, do not try to get the Voucher list
-        ConnectivityManager connectivityManager = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        if(activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-            Snackbar.make(getView(), "Check your Internet connection", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+
+        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
             return;
-        }
 
         getVouchers();
     }
