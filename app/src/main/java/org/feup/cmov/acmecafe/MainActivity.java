@@ -23,10 +23,12 @@ import org.feup.cmov.acmecafe.Models.Product;
 import org.feup.cmov.acmecafe.Models.Voucher;
 import org.feup.cmov.acmecafe.OrderList.OrderFragment;
 import org.feup.cmov.acmecafe.PastTransactions.PastTransactionsFragment;
+import org.feup.cmov.acmecafe.VoucherList.VoucherListAdapter;
 import org.feup.cmov.acmecafe.VoucherList.VoucherListFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -38,7 +40,6 @@ public class MainActivity extends AppCompatActivity
 
     HashMap<Product,Integer> mCurrentOrder = new HashMap<>();
     ArrayList<Voucher> mOrderVouchers = new ArrayList<>();
-    ArrayList<Voucher> mUserVouchers = new ArrayList<>();
     Toolbar mToolbar;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +94,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        //getMenuInflater().inflate(R.menu.main, menu);
+        return false;
     }
 
     @Override
@@ -134,9 +135,6 @@ public class MainActivity extends AppCompatActivity
             Fragment fragment = null;
             if(fragmentClass == OrderFragment.class) {
                 fragment = OrderFragment.newInstance(mCurrentOrder, mOrderVouchers);
-            }
-            else if(fragmentClass == VoucherListFragment.class) {
-                fragment = VoucherListFragment.newInstance(mUserVouchers);
             }
             else {
                 fragment = (Fragment) fragmentClass.newInstance();
@@ -198,26 +196,43 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onVoucherAdded(Voucher voucher, int pos, RecyclerView.Adapter adapter) {
+    public void onVoucherAdded(Voucher voucher, int pos, VoucherListAdapter adapter) {
         voucher.setIsUsed(true);
         voucher.save();
+
+        if(voucher.getType() == 3) {
+            adapter.toggleDiscountVouchers(true);
+        }
+
         mOrderVouchers.add(voucher);
-        adapter.notifyItemChanged(pos);
+        adapter.notifyDataSetChanged();
 
         Snackbar.make(getCurrentFocus(), "Voucher " + voucher.getName() + " added to your current order.", Snackbar.LENGTH_SHORT)
                 .setAction("Action", null).show();
     }
 
     @Override
-    public void onVoucherRefreshed(ArrayList<Voucher> userVouchers) {
+    public void onVoucherRefreshed() {
         mOrderVouchers.clear();
-        mUserVouchers = userVouchers;
     }
 
     @Override
     public void onVoucherRemove(Voucher item, int pos, RecyclerView.Adapter adapter, TextView priceTV) {
         item.setIsUsed(false);
         item.save();
+
+        //is the voucher removed from the order is the 5%discount, enable the user to add them
+        if(item.getType() == 3) {
+            List<Voucher> vouchers = Voucher.listAll(Voucher.class);
+            for(Voucher v: vouchers) {
+                if(v.getType() == 3) {
+                    v.setIsUsed(false);
+                    v.save();
+                }
+
+            }
+        }
+
         this.mOrderVouchers.remove(item);
         adapter.notifyItemRemoved(pos);
         OrderFragment.calculateOrderPrice(mCurrentOrder, mOrderVouchers, priceTV);

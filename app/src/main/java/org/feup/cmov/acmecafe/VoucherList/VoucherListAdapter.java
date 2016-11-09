@@ -36,6 +36,16 @@ public class VoucherListAdapter extends RecyclerView.Adapter<VoucherListAdapter.
         this.mContext = null;
     }
 
+    public void toggleDiscountVouchers(boolean state) {
+        for(int i = 0; i < mDataset.size(); i++) {
+            Voucher current = mDataset.get(i);
+            if(current.getType() == 3) {
+                current.setIsUsed(state);
+                current.save();
+            }
+        }
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         this.mContext = parent.getContext();
@@ -50,10 +60,13 @@ public class VoucherListAdapter extends RecyclerView.Adapter<VoucherListAdapter.
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Voucher voucher = mDataset.get(position);
         holder.mNameTextView.setText(voucher.getName());
+        holder.mAddToCartImageView.setBackground(null);
+        holder.mAddToCartImageView.setOnClickListener(null);
 
         Log.d("VoucherAdapter", "Voucher " + voucher.getName() + " with IsUsed " + voucher.getIsUsed());
         if(!voucher.getIsUsed()) {
-            final RecyclerView.Adapter adapter = this;
+            Log.d("VoucherAdapter", "Rendering ImageView");
+            final VoucherListAdapter adapter = this;
             holder.mAddToCartImageView.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.mipmap.ic_add_to_order,null));
             holder.mAddToCartImageView.setOnClickListener(new View.OnClickListener() {
                 @Override

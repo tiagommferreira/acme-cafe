@@ -11,6 +11,10 @@ public class Voucher extends SugarRecord implements Serializable {
     private String signature;
     private boolean isUsed;
 
+    public Voucher() {
+
+    }
+
     public Voucher(int id, int type, String name, String signature) {
         this.voucherId = id;
         this.type = type;

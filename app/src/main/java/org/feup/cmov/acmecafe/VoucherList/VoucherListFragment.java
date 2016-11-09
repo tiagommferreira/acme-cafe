@@ -42,11 +42,11 @@ public class VoucherListFragment extends Fragment {
     public VoucherListFragment() {
     }
 
-    public static VoucherListFragment newInstance(ArrayList<Voucher> vouchers) {
+    public static VoucherListFragment newInstance() {
         VoucherListFragment fragment = new VoucherListFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_USER_VOUCHERS, vouchers);
-        fragment.setArguments(args);
+        //Bundle args = new Bundle();
+        //args.putSerializable(ARG_USER_VOUCHERS, vouchers);
+        //fragment.setArguments(args);
         return fragment;
     }
 
@@ -54,7 +54,7 @@ public class VoucherListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mVouchers = (ArrayList<Voucher>) getArguments().getSerializable(ARG_USER_VOUCHERS);
+            //mVouchers = (ArrayList<Voucher>) getArguments().getSerializable(ARG_USER_VOUCHERS);
         }
     }
 
@@ -64,15 +64,20 @@ public class VoucherListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_voucher_list, container, false);
 
+        mVouchers.clear();
+        mVouchers.addAll(Voucher.listAll(Voucher.class));
+
+        Log.d("VoucherListFragment", "Vouchers size: " + mVouchers.size());
+
+        if(mVouchers.size() == 0)
+            attemptGetVouchers();
+
         // Set the adapter
         if (view instanceof SwipeRefreshLayout) {
             RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.voucher_list);
             recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
             mVoucherListAdapter = new VoucherListAdapter(mVouchers, mListener);
             recyclerView.setAdapter(mVoucherListAdapter);
-
-            mVouchers.clear();
-            mVouchers.addAll(Voucher.listAll(Voucher.class));
 
             mSwipeRefreshLayout = (SwipeRefreshLayout) view;
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -113,8 +118,9 @@ public class VoucherListFragment extends Fragment {
                                 e.printStackTrace();
                             }
                         }
+                        mVoucherListAdapter.toggleDiscountVouchers(false);
                         mVoucherListAdapter.notifyDataSetChanged();
-                        mListener.onVoucherRefreshed(mVouchers);
+                        mListener.onVoucherRefreshed();
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }, new Response.ErrorListener() {
@@ -154,8 +160,6 @@ public class VoucherListFragment extends Fragment {
         super.onResume();
         MainActivity activity = (MainActivity) getActivity();
         activity.setToolbarTitle("Vouchers");
-        if(mVouchers.size() == 0)
-            attemptGetVouchers();
     }
 
     private String getUserUUID() {
@@ -165,7 +169,7 @@ public class VoucherListFragment extends Fragment {
     }
 
     public interface OnVoucherInteractionListener {
-        void onVoucherAdded(Voucher voucher, int pos, RecyclerView.Adapter adapter);
-        void onVoucherRefreshed(ArrayList<Voucher> userVouchers);
+        void onVoucherAdded(Voucher voucher, int pos, VoucherListAdapter adapter);
+        void onVoucherRefreshed();
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.widget.TextView;
 
 import org.feup.cmov.acmecafe.Models.Order;
@@ -52,5 +53,12 @@ public class OrderDetailsActivity extends AppCompatActivity {
         float price = Utils.calculateOrderPrice(products, vouchers);
 
         return price;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        //getMenuInflater().inflate(R.menu.main, menu);
+        return false;
     }
 }

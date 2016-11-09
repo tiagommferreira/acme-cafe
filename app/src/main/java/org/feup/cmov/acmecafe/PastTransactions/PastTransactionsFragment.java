@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -69,7 +70,7 @@ public class PastTransactionsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_past_transactions, container, false);
+        final View view = inflater.inflate(R.layout.fragment_past_transactions, container, false);
 
         mAuthenticateForm = view.findViewById(R.id.authenticate_form);
         mAskPasswordField = (EditText) mAuthenticateForm.findViewById(R.id.ask_password_input);
@@ -77,6 +78,12 @@ public class PastTransactionsFragment extends Fragment {
         mAuthenticateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //close the keyboard
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+
                 showProgress(true, false);
                 attemptAuthenticate(mAskPasswordField.getText().toString());
             }
