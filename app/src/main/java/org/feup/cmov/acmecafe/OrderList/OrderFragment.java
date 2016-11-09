@@ -47,6 +47,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class OrderFragment extends Fragment {
@@ -117,6 +118,23 @@ public class OrderFragment extends Fragment {
         mQRCodeImageView = (ImageView) view.findViewById(R.id.qr_code_image);
         //progress view while generating qr code
         mProgressView = view.findViewById(R.id.qr_code_progress);
+
+        Button clearOrderButton = (Button) view.findViewById(R.id.clear_order_button);
+        clearOrderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentOrder.clear();
+                mOrderListAdapter.notifyDataSetChanged();
+                mOrderVouchers.clear();
+                mOrderVoucherListAdapter.notifyDataSetChanged();
+                List<Voucher> vouchers = Voucher.listAll(Voucher.class);
+                for(Voucher voucher: vouchers) {
+                    voucher.setIsUsed(false);
+                    voucher.save();
+                    calculateOrderPrice(mCurrentOrder, mOrderVouchers, mPriceTextView);
+                }
+            }
+        });
 
         mQRCodeButton = (Button) view.findViewById(R.id.qr_code_button);
         mQRCodeButton.setOnClickListener(new View.OnClickListener() {

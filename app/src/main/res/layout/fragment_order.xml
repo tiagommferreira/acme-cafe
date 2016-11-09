@@ -60,6 +60,13 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:textStyle="bold"/>
 
+        <Button
+            android:id="@+id/clear_order_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear Order"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
         <Button
             android:id="@+id/qr_code_button"
