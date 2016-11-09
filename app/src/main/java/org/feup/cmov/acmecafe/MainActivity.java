@@ -229,13 +229,22 @@ public class MainActivity extends AppCompatActivity
                     v.setIsUsed(false);
                     v.save();
                 }
-
             }
         }
 
         this.mOrderVouchers.remove(item);
         adapter.notifyItemRemoved(pos);
         OrderFragment.calculateOrderPrice(mCurrentOrder, mOrderVouchers, priceTV);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        List<Voucher> vouchers = Voucher.listAll(Voucher.class);
+        for(Voucher v: vouchers) {
+            v.setIsUsed(false);
+            v.save();
+        }
     }
 
     @Override
