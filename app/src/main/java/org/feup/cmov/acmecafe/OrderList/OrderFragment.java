@@ -98,10 +98,15 @@ public class OrderFragment extends Fragment {
         //price text view
         mPriceTextView = (TextView) view.findViewById(R.id.order_price);
 
+        //qrcode image
+        mQRCodeImageView = (ImageView) view.findViewById(R.id.qr_code_image);
+        //progress view while generating qr code
+        mProgressView = view.findViewById(R.id.qr_code_progress);
+
         //set up the products recycler view
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.order_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        mOrderListAdapter = new OrderAdapter(mCurrentOrder, mListener, mPriceTextView);
+        mOrderListAdapter = new OrderAdapter(mCurrentOrder, mListener, mPriceTextView, mQRCodeImageView);
         recyclerView.setAdapter(mOrderListAdapter);
         setUpItemTouchHelper(recyclerView);
         setUpAnimationDecoratorHelper(recyclerView);
@@ -109,15 +114,11 @@ public class OrderFragment extends Fragment {
         //set up the vouchers recycler view
         RecyclerView voucherRecyclerView = (RecyclerView) view.findViewById(R.id.order_voucher_list);
         voucherRecyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        mOrderVoucherListAdapter = new OrderVoucherAdapter(mOrderVouchers, mVoucherListener, mPriceTextView);
+        mOrderVoucherListAdapter = new OrderVoucherAdapter(mOrderVouchers, mVoucherListener, mPriceTextView, mQRCodeImageView);
         voucherRecyclerView.setAdapter(mOrderVoucherListAdapter);
 
         calculateOrderPrice(mCurrentOrder, mOrderVouchers, mPriceTextView);
 
-        //qrcode image
-        mQRCodeImageView = (ImageView) view.findViewById(R.id.qr_code_image);
-        //progress view while generating qr code
-        mProgressView = view.findViewById(R.id.qr_code_progress);
 
         Button clearOrderButton = (Button) view.findViewById(R.id.clear_order_button);
         clearOrderButton.setOnClickListener(new View.OnClickListener() {

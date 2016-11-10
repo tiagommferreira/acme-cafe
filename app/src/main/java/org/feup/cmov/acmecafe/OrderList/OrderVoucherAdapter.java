@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapter.ViewHolder> {
     private ArrayList<Voucher> mDataset;
     private TextView mPriceTV;
+    private ImageView mQRCodeImageView;
     private OrderFragment.OnOrderVoucherInteractionListener mListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -27,10 +28,11 @@ public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapte
         }
     }
 
-    public OrderVoucherAdapter(ArrayList<Voucher> vouchers, OrderFragment.OnOrderVoucherInteractionListener listener, TextView mPriceTextView) {
+    public OrderVoucherAdapter(ArrayList<Voucher> vouchers, OrderFragment.OnOrderVoucherInteractionListener listener, TextView mPriceTextView, ImageView qrCodeImageView) {
         this.mDataset = vouchers;
         this.mListener = listener;
         this.mPriceTV = mPriceTextView;
+        this.mQRCodeImageView = qrCodeImageView;
     }
 
     @Override
@@ -53,6 +55,7 @@ public class OrderVoucherAdapter extends RecyclerView.Adapter<OrderVoucherAdapte
                 @Override
                 public void onClick(View v) {
                     mListener.onVoucherRemove(voucher, position, adapter, mPriceTV);
+                    mQRCodeImageView.setImageBitmap(null);
                 }
             });
         }

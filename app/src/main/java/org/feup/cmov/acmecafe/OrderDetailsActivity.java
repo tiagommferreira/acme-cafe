@@ -39,10 +39,10 @@ public class OrderDetailsActivity extends AppCompatActivity {
         mVouchers = order.getVouchers();
 
         mProductsRecyclerView = (RecyclerView) findViewById(R.id.order_details_products_list);
-        mProductsRecyclerView.setAdapter(new OrderAdapter(mProducts, null, null));
+        mProductsRecyclerView.setAdapter(new OrderAdapter(mProducts, null, null, null));
 
         mVouchersRecyclerView = (RecyclerView) findViewById(R.id.order_details_voucher_list);
-        mVouchersRecyclerView.setAdapter(new OrderVoucherAdapter(mVouchers, null, null));
+        mVouchersRecyclerView.setAdapter(new OrderVoucherAdapter(mVouchers, null, null, null));
 
         TextView priceTV = (TextView) findViewById(R.id.order_details_price);
         priceTV.setText("Total: " + calculateOrderPrice(mProducts, mVouchers) + "€");

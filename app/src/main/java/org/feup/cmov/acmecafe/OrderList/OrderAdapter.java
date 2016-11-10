@@ -16,6 +16,7 @@ import java.util.HashMap;
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> {
     private HashMap<Product, Integer> mDataset;
     private TextView mPriceTV;
+    private ImageView mQRCodeImageView;
     private final OrderFragment.OnOrderItemInteractionListener mListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -32,10 +33,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public OrderAdapter(HashMap<Product, Integer> myDataset,
-                           OrderFragment.OnOrderItemInteractionListener listener, TextView priceTV) {
+                        OrderFragment.OnOrderItemInteractionListener listener, TextView priceTV, ImageView qrCodeImageView) {
         mDataset = myDataset;
         mListener = listener;
         mPriceTV = priceTV;
+        mQRCodeImageView = qrCodeImageView;
     }
 
     // Create new views (invoked by the layout manager)
@@ -60,6 +62,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     mListener.onItemRemove(item, position, adapter,mPriceTV);
+                    mQRCodeImageView.setImageBitmap(null);
                 }
             });
         }
