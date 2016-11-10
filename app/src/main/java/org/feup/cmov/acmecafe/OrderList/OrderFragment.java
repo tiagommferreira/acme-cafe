@@ -22,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,10 +45,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 
 
 public class OrderFragment extends Fragment {
@@ -201,8 +207,9 @@ public class OrderFragment extends Fragment {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                String content = "";
+                String content = null;
                 try {
+
                     JSONObject toSend = new JSONObject();
                     String uuid = getUserUUID();
                     toSend.put("uuid", uuid);
@@ -220,6 +227,7 @@ public class OrderFragment extends Fragment {
                     toSend.put("products", products);
 
                     JSONArray vouchers = new JSONArray();
+                    
                     for(int i = 0; i < mOrderVouchers.size(); i++) {
                         JSONObject voucher = new JSONObject();
                         Voucher item = mOrderVouchers.get(i);
@@ -233,8 +241,19 @@ public class OrderFragment extends Fragment {
                     toSend.put("vouchers", vouchers);
 
                     byte[] toSendBytes = toSend.toString().getBytes();
+                    /*
+                    ByteArrayOutputStream os = new ByteArrayOutputStream(toSend.toString().length());
+                    GZIPOutputStream gos = new GZIPOutputStream(os);
+                    gos.write(toSend.toString().getBytes());
+                    gos.close();
+                    byte[] compressed = os.toByteArray();
+                    os.close();
+
+                    Log.d("BEFORE COMPRESSION", String.valueOf(toSendBytes.length));
+                    Log.d("AFTER COMPRESSION", String.valueOf(compressed.length));
+                    */
                     content = new String(toSendBytes, "ISO-8859-1");
-                } catch (UnsupportedEncodingException | JSONException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
                 try {
@@ -254,6 +273,29 @@ public class OrderFragment extends Fragment {
             }
         });
         t.start();
+    }
+
+    private int calculateOrderSize() {
+        //int, string, float, int
+        int productsSize = 0;
+
+        for(int i = 0; i < mCurrentOrder.size(); i++) {
+            Product current = (Product) mCurrentOrder.keySet().toArray()[i];
+            productsSize += 32 + 32 + 32 + current.getName().getBytes().length;
+        }
+
+        //int, int, int, String, String
+        int vouchersSize = 0;
+
+        for(int i = 0; i < mOrderVouchers.size(); i++) {
+            Voucher current = mOrderVouchers.get(i);
+            vouchersSize += 32 + 32 + 32;
+            vouchersSize += current.getName().getBytes().length;
+            vouchersSize += current.getSignature().getBytes().length;
+        }
+
+        return 32 + 32 + vouchersSize + productsSize;
+
     }
 
     private String getUserUUID() {

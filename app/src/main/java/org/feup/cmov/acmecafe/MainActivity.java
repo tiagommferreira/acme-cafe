@@ -197,6 +197,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onVoucherAdded(Voucher voucher, int pos, VoucherListAdapter adapter) {
+
+        if(mOrderVouchers.size() == 3) {
+            //The user cannot add another voucher, display a message saying that
+            Snackbar.make(getCurrentFocus(), "You can only add up to 3 vouchers to one order.", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+            return;
+        }
+
         voucher.setIsUsed(true);
         voucher.save();
 
