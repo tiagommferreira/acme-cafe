@@ -241,7 +241,7 @@ public class OrderFragment extends Fragment {
                     toSend.put("vouchers", vouchers);
 
                     byte[] toSendBytes = toSend.toString().getBytes();
-                    /*
+
                     ByteArrayOutputStream os = new ByteArrayOutputStream(toSend.toString().length());
                     GZIPOutputStream gos = new GZIPOutputStream(os);
                     gos.write(toSend.toString().getBytes());
@@ -249,9 +249,50 @@ public class OrderFragment extends Fragment {
                     byte[] compressed = os.toByteArray();
                     os.close();
 
-                    Log.d("BEFORE COMPRESSION", String.valueOf(toSendBytes.length));
-                    Log.d("AFTER COMPRESSION", String.valueOf(compressed.length));
-                    */
+                    JSONObject toSend2 = new JSONObject();
+                    String uuid2 = getUserUUID();
+                    toSend2.put("uuid", uuid);
+
+                    JSONArray products2 = new JSONArray();
+                    for(int i = 0; i < mCurrentOrder.size(); i++) {
+                        JSONObject product = new JSONObject();
+                        Product item = (Product) mCurrentOrder.keySet().toArray()[i];
+                        product.put("id", item.getProductId());
+                        product.put("name", item.getName());
+                        product.put("price", item.getPrice());
+                        product.put("quantity", mCurrentOrder.get(item));
+                        products2.put(product);
+                    }
+                    toSend2.put("products", products2);
+
+                    JSONArray vouchers2 = new JSONArray();
+
+                    for(int i = 0; i < mOrderVouchers.size(); i++) {
+                        JSONObject voucher = new JSONObject();
+                        Voucher item = mOrderVouchers.get(i);
+                        voucher.put("id", i);
+                        voucher.put("voucher_id", item.getVoucherId());
+                        //voucher.put("name", item.getName());
+                        voucher.put("type", item.getType());
+                        voucher.put("signature", item.getSignature());
+                        vouchers2.put(voucher);
+                    }
+                    toSend2.put("vouchers", vouchers2);
+
+                    byte[] toSendBytes2 = toSend2.toString().getBytes();
+
+                    ByteArrayOutputStream os2 = new ByteArrayOutputStream(toSend2.toString().length());
+                    GZIPOutputStream gos2 = new GZIPOutputStream(os2);
+                    gos2.write(toSend2.toString().getBytes());
+                    gos2.close();
+                    byte[] compressed2 = os2.toByteArray();
+                    os2.close();
+
+                    Log.d("BEFORE COMPRESSION WITH NAME", String.valueOf(toSendBytes.length));
+                    Log.d("BEFORE COMPRESSION NO NAME", String.valueOf(toSendBytes2.length));
+                    Log.d("AFTER COMPRESSION WITH NAME", String.valueOf(compressed.length));
+                    Log.d("AFTER COMPRESSION NO NAME", String.valueOf(compressed2.length));
+
                     content = new String(toSendBytes, "ISO-8859-1");
                 } catch (JSONException | IOException e) {
                     e.printStackTrace();

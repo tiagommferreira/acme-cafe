@@ -3,6 +3,9 @@ package org.feup.cmov.acmecafe;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +25,7 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -32,6 +36,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
+
+import java.util.Calendar;
 
 /**
  * A login screen that offers login via email/password.
@@ -50,6 +57,10 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private View mProgressView;
     private View mRegisterFormView;
+    private TextView mCreditCardExpirationView;
+    private int mCreditCardDay;
+    private int mCreditCardMonth;
+    private int mCreditCardYear;
 
     private String mUUID;
     private int mPin;
@@ -75,6 +86,23 @@ public class RegisterActivity extends AppCompatActivity {
         mNameView = (EditText) findViewById(R.id.name);
         mUsernameView = (EditText) findViewById(R.id.username);
         mCreditcardView = (EditText) findViewById(R.id.creditcard);
+
+        final Calendar c = Calendar.getInstance();
+        mCreditCardYear = c.get(Calendar.YEAR);
+        mCreditCardMonth = c.get(Calendar.MONTH) + 1;
+        mCreditCardDay = c.get(Calendar.DAY_OF_MONTH);
+
+        mCreditCardExpirationView = (TextView) findViewById(R.id.cc_expiration_date);
+        mCreditCardExpirationView.setText("Expiration date: " + mCreditCardDay + "/" + mCreditCardMonth + "/" + mCreditCardYear);
+
+        Button changeDateButton = (Button) findViewById(R.id.date_picker_button);
+        changeDateButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getFragmentManager(), "datePicker");
+            }
+        });
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -196,6 +224,9 @@ public class RegisterActivity extends AppCompatActivity {
             body.put("username", username);
             body.put("creditcard", creditcard);
             body.put("password", password);
+            body.put("cc_year", mCreditCardYear);
+            body.put("cc_month", mCreditCardMonth);
+            body.put("cc_day", mCreditCardDay);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -315,6 +346,34 @@ public class RegisterActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    public void updateCCDate(int day, int month, int year) {
+        this.mCreditCardDay = day;
+        this.mCreditCardMonth = month;
+        this.mCreditCardYear = year;
+        this.mCreditCardExpirationView.setText("Expiration date: " + mCreditCardDay + "/" + mCreditCardMonth + "/" + mCreditCardYear);
+    }
+
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+            ((RegisterActivity) getActivity()).updateCCDate(dayOfMonth, month+1, year);
+        }
     }
 
 }
