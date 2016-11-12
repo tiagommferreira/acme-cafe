@@ -111,8 +111,11 @@ public class MenuListFragment extends Fragment {
 
     public void attemptGetMenu() {
 
-        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
+        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))){
+            mSwipeRefreshLayout.setRefreshing(false);
             return;
+        }
+
 
         getMenu();
     }

@@ -67,10 +67,6 @@ public class VoucherListFragment extends Fragment {
         mVouchers.clear();
         mVouchers.addAll(Voucher.listAll(Voucher.class));
 
-        Log.d("VoucherListFragment", "Vouchers size: " + mVouchers.size());
-
-        if(mVouchers.size() == 0)
-            attemptGetVouchers();
 
         // Set the adapter
         if (view instanceof SwipeRefreshLayout) {
@@ -94,8 +90,10 @@ public class VoucherListFragment extends Fragment {
 
     private void attemptGetVouchers() {
 
-        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
+        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
+            mSwipeRefreshLayout.setRefreshing(false);
             return;
+        }
 
         getVouchers();
     }
@@ -160,6 +158,8 @@ public class VoucherListFragment extends Fragment {
         super.onResume();
         MainActivity activity = (MainActivity) getActivity();
         activity.setToolbarTitle("Vouchers");
+        if(mVouchers.size() == 0)
+            attemptGetVouchers();
     }
 
     private String getUserUUID() {

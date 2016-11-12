@@ -126,8 +126,10 @@ public class PastTransactionsFragment extends Fragment {
 
     private void attemptAuthenticate(String password) {
 
-        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
+        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
+            showProgress(false,false);
             return;
+        }
 
         authenticate(password);
     }
@@ -172,9 +174,10 @@ public class PastTransactionsFragment extends Fragment {
     }
 
     private void attemptGetTransactions() {
-
-        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
+        if(!Utils.hasInternetConnection(getView(), (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
+            showProgress(false,false);
             return;
+        }
 
         getTransactions();
     }
